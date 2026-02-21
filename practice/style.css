@@ -1,0 +1,44 @@
+#main-btn {
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+.title {
+  color: blue;
+}
+body {
+  background-color: lightgrey;
+}
+.bio {
+  font-size: 18px;
+  color: grey;
+  padding: 20px;
+  margin: 30px 0;
+  border: 2px solid black;
+}
+img {
+  width: 300px;
+  border-radius: 10px;
+}
+.skills {
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* centers horizontally */
+  align-items: center; /* centers vertically */
+  height: 100px;
+  background-color: lightblue;
+}
+
+.skill {
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+@media (max-width: 600px) {
+  .skills {
+    flex-direction: column;
+    align-items: center;
+  }
+}

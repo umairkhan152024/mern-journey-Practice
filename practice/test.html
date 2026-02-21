@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1 class="title">My Profile</h1>
+      <nav>
+        <a href="#about" target="_blank" rel="noopener">About</a>
+        <a href="#skills" target="_blank" rel="noopener">Skills</a>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <p class="bio">I am Umair Khan and I am 32 years old</p>
+        <img
+          src="https://images.pexels.com/photos/4623023/pexels-photo-4623023.jpeg"
+          alt="profile"
+        />
+      </section>
+
+      <aside>
+        <h3>Quick Facts</h3>
+        <p>📍 Based in Hong Kong</p>
+        <p>💼 Learning MERN Stack</p>
+        <p>🚀 6 months to top 2%</p>
+      </aside>
+
+      <section class="skills">
+        <div class="skill">HTML</div>
+        <div class="skill">CSS</div>
+        <div class="skill">JavaScript</div>
+      </section>
+      <section id="contact">
+        <form>
+          <label>Name:</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter your name"
+            required
+          />
+
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+          />
+
+          <label>Password:</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            required
+          />
+
+          <label>Message:</label>
+          <textarea
+            name="message"
+            placeholder="Write your message"
+            required
+          ></textarea>
+
+          <button type="submit">Send</button>
+        </form>
+      </section>
+      <section id="projects">
+        <table>
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Technology</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Portfolio</td>
+              <td>HTML & CSS</td>
+              <td>In Progress</td>
+            </tr>
+            <tr>
+              <td>GitHub Explorer</td>
+              <td>JavaScript</td>
+              <td>Coming Soon</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2024 Umair Khan</p>
+    </footer>
+  </body>
+</html>
