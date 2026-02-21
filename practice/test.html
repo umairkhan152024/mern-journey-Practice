@@ -3,15 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta
+      name="description"
+      content="Umair Khan - MERN Stack Developer based in Hong Kong"
+    />
+    <meta
+      name="keywords"
+      content="MERN, Full Stack Developer, React, Node.js, Hong Kong"
+    />
+    <meta name="author" content="Umair Khan" />
+    <title>Umair Khan | Full Stack Developer</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
       <h1 class="title">My Profile</h1>
       <nav>
-        <a href="#about" target="_blank" rel="noopener">About</a>
-        <a href="#skills" target="_blank" rel="noopener">Skills</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
       </nav>
     </header>
 
@@ -38,32 +47,27 @@
       </section>
       <section id="contact">
         <form>
-          <label>Name:</label>
+          <label for="username">Name:</label>
           <input
             type="text"
+            id="username"
             name="username"
             placeholder="Enter your name"
             required
           />
 
-          <label>Email:</label>
+          <label for="email">Email:</label>
           <input
             type="email"
+            id="email"
             name="email"
             placeholder="Enter your email"
             required
           />
 
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter password"
-            required
-          />
-
-          <label>Message:</label>
+          <label for="message">Message:</label>
           <textarea
+            id="message"
             name="message"
             placeholder="Write your message"
             required
