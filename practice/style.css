@@ -1,8 +1,22 @@
+:root {
+  --primary-color: green;
+  --text-color: white;
+  --padding: 10px 20px;
+}
+
 #main-btn {
-  background-color: green;
-  color: white;
-  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: var(--padding);
   border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#main-btn:hover {
+  background-color: darkgreen;
+  transform: translateY(-3px);
 }
 .title {
   color: blue;
@@ -14,11 +28,12 @@ body {
   font-size: 18px;
   color: grey;
   padding: 20px;
-  margin: 30px 0;
+  margin: 30px 0px;
   border: 2px solid black;
 }
 img {
   width: 300px;
+  height: 200px;
   border-radius: 10px;
 }
 .skills {
@@ -31,14 +46,33 @@ img {
 }
 
 .skill {
-  background-color: green;
-  color: white;
-  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: var(--padding);
   border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.skill:hover {
+  background-color: rgb(216, 207, 208);
+  transform: scale(1.1);
 }
 @media (max-width: 600px) {
   .skills {
     flex-direction: column;
     align-items: center;
   }
+}
+.grid-practice {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  padding: 10px;
+}
+
+.grid-practice div {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: 20px;
+  text-align: center;
 }
