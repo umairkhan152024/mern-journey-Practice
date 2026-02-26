@@ -67,3 +67,21 @@ const sayHi = makeGreeting("Hi");
 
 sayHello("Umair"); // Hello Umair!
 sayHi("Umair"); // Hi Umair!
+
+// JSON.parse — string to object
+const jsonString = '{"name": "Umair", "city": "Hong Kong"}';
+const obj = JSON.parse(jsonString);
+console.log(obj.name);
+console.log(obj.city);
+
+// JSON.stringify — object to string
+const developer1 = { name: "Umair", city: "Hong Kong" };
+const converted = JSON.stringify(developer1);
+console.log(converted);
+
+// try/catch with JSON
+try {
+  const data = JSON.parse("invalid json");
+} catch (error) {
+  console.log(`Error caught: ${error.message}`);
+}
