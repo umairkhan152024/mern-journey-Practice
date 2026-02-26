@@ -1,24 +1,40 @@
-const title = document.querySelector("#title");
-const bio = document.querySelector(".bio");
+// Save to localStorage
+localStorage.setItem("username", "Umair Khan");
+localStorage.setItem("goal", "Top 2% MERN Developer in HK");
 
-title.textContent = "Umair Khan - MERN Developer";
-bio.textContent = "Building the future of Hong Kong tech";
-title.style.color = "blue";
+// Get from localStorage
+const username = localStorage.getItem("username");
+const goal = localStorage.getItem("goal");
 
-const btn = document.querySelector("#btn");
+console.log(username);
+console.log(goal);
+//
+//
+//
+// Save data
+localStorage.setItem("username1", "Umair Khan");
+localStorage.setItem("city1", "Hong Kong");
 
-let isClicked = false;
+// Get data
+const username1 = localStorage.getItem("username1");
+console.log(username1); // Umair Khan
 
-btn.addEventListener("click", () => {
-  if (isClicked) {
-    title.textContent = "Umair Khan - MERN Developer";
-    title.style.color = "blue";
-    btn.textContent = "Click Me";
-    isClicked = false;
-  } else {
-    title.textContent = "You clicked the button!";
-    title.style.color = "red";
-    btn.textContent = "Click Again";
-    isClicked = true;
-  }
-});
+// Remove one item
+localStorage.removeItem("username1");
+
+// Clear everything
+localStorage.clear();
+//
+//
+//
+//
+
+const developer = { name: "Umair", city: "Hong Kong", salary: 35000 };
+
+// Save object
+localStorage.setItem("developer", JSON.stringify(developer));
+
+// Get object back
+const dev = JSON.parse(localStorage.getItem("developer"));
+console.log(dev.name); // Umair
+console.log(dev.city); // Hong Kong
