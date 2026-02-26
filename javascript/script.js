@@ -41,3 +41,29 @@ const addAll = (...numbers) => {
   return numbers.reduce((acc, num) => acc + num, 0);
 };
 console.log(addAll(10, 20, 30, 40)); // 100
+
+function makeCounter() {
+  let count = 0; // this variable is "closed over"
+
+  return function () {
+    count++;
+    console.log(`Count: ${count}`);
+  };
+}
+
+const counter = makeCounter();
+counter(); // Count: 1
+counter(); // Count: 2
+counter(); // Count: 3
+
+function makeGreeting(greeting) {
+  return function (name) {
+    console.log(`${greeting} ${name}!`);
+  };
+}
+
+const sayHello = makeGreeting("Hello");
+const sayHi = makeGreeting("Hi");
+
+sayHello("Umair"); // Hello Umair!
+sayHi("Umair"); // Hi Umair!
