@@ -1,40 +1,142 @@
-// Save to localStorage
-localStorage.setItem("username", "Umair Khan");
-localStorage.setItem("goal", "Top 2% MERN Developer in HK");
+/*
+function fetchData(callback) {
+  setTimeout(() => {
+    const data = { name: "Umair", city: "Hong Kong" };
+    callback(data);
+  }, 1000);
+}
 
-// Get from localStorage
-const username = localStorage.getItem("username");
-const goal = localStorage.getItem("goal");
+fetchData((data) => {
+  console.log(`Got data: ${data.name}`);
+});
 
-console.log(username);
-console.log(goal);
-//
-//
-//
-// Save data
-localStorage.setItem("username1", "Umair Khan");
-localStorage.setItem("city1", "Hong Kong");
-
-// Get data
-const username1 = localStorage.getItem("username1");
-console.log(username1); // Umair Khan
-
-// Remove one item
-localStorage.removeItem("username1");
-
-// Clear everything
-localStorage.clear();
+console.log("This runs immediately!");
 //
 //
 //
 //
+//
+//
+// Pizza shop
+function orderPizza1(callback) {
+  console.log("Making your pizza01");
 
-const developer = { name: "Umair", city: "Hong Kong", salary: 35000 };
+  setTimeout(() => {
+    const pizza1 = "Pepperoni Pizza01";
+    callback(pizza1); // pizza ready — calling you back!
+  }, 2000);
+}
 
-// Save object
-localStorage.setItem("developer", JSON.stringify(developer));
+// You ordering
+orderPizza1((pizza1) => {
+  console.log(`Pizza arrived: ${pizza1}`);
+});
 
-// Get object back
-const dev = JSON.parse(localStorage.getItem("developer"));
-console.log(dev.name); // Umair
-console.log(dev.city); // Hong Kong
+// You watching TV while waiting
+console.log("Watching TV...");
+///
+//
+//
+//
+
+function orderPizza1() {
+  return new Promise((resolve, reject) => {
+    console.log("Making your pizza...");
+
+    setTimeout(() => {
+      const pizzaReady1 = true;
+
+      if (pizzaReady1) {
+        resolve("Pepperoni Pizza is ready!");
+      } else {
+        reject("Sorry, we ran out of ingredients!");
+      }
+    }, 3000);
+  });
+}
+
+orderPizza1()
+  .then((pizza1) => console.log(pizza1))
+  .catch((error) => console.log(error));
+
+console.log("Watching TV...");
+//
+//
+//
+//
+//
+
+function orderPizza() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const pizzaReady = false;
+      if (pizzaReady) {
+        resolve("Pepperoni Pizza is ready!");
+      } else {
+        reject("Sorry, no pizza today!");
+      }
+    }, 2000);
+  });
+}
+
+const getPizza = async () => {
+  try {
+    console.log("Ordering pizza...");
+    const pizza = await orderPizza();
+    console.log(pizza);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+getPizza();
+console.log("Watching TV...");
+
+//
+//
+//
+//
+//
+//
+//
+
+const getUser = async () => {
+  try {
+    const response = await fetch(
+      "https://api.github.com/users/umairkhan152024",
+    );
+    const data = await response.json();
+    console.log(data.name);
+    console.log(data.public_repos);
+    console.log(data.followers);
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+};
+
+getUser();
+*/
+//
+//
+//
+//
+//
+//
+const getUser = async () => {
+  try {
+    const response = await fetch(
+      "https://api.github.com/users/umairkhan152024",
+    );
+    const data = await response.json();
+
+    document.querySelector("#devName").textContent = `Name: ${data.name}`;
+    document.querySelector("#repos").textContent =
+      `Repos: ${data.public_repos}`;
+    document.querySelector("#followers").textContent =
+      `Followers: ${data.followers}`;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+};
+
+getUser();
