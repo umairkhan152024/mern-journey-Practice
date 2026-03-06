@@ -54,6 +54,7 @@ export default App;
 //
 //
 //
+/*
 import { useState, useEffect } from "react";
 
 function App() {
@@ -77,6 +78,39 @@ function App() {
         </div>
       ) : (
         <p>Loading...</p>
+      )}
+    </div>
+  );
+}
+
+export default App;
+*/
+//
+//
+//
+import { useState, useEffect } from "react";
+
+function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("https://api.github.com/users/umairkhan152024")
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data);
+      });
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      {user ? (
+        <div className="bg-white rounded-xl p-8 shadow-lg text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{user.name}</h1>
+          <p className="text-gray-500 mb-4">Repos: {user.public_repos}</p>
+          <p className="text-gray-500">Followers: {user.followers}</p>
+        </div>
+      ) : (
+        <p className="text-white text-xl">Loading...</p>
       )}
     </div>
   );
