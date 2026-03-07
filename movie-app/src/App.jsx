@@ -99,7 +99,7 @@ function App() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && searchMovies()}
+          onKeyDown={(e) => e.key === "Enter" && searchMovies()}
           placeholder="Search movies..."
           className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:border-blue-500"
         />
