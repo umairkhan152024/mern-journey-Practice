@@ -1,80 +1,44 @@
 // ════════════════════════════════════════════════════════════
-//  HOME PAGE — Main movie search page
-//  Contains: search input, movies grid, loading, error states
+//  HOME PAGE — UI only, no fetch logic here!
+//  All fetching logic moved to useFetchMovies.js custom hook
 // ════════════════════════════════════════════════════════════
 
 // ─── 1. IMPORTS ─────────────────────────────────────────────
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
-// ─── 2. API KEY ──────────────────────────────────────────────
-// Reads API key from .env file — never hardcode keys!
-const API_KEY = import.meta.env.VITE_API_KEY;
+// ─── 2. IMPORT CUSTOM HOOK ──────────────────────────────────
+// useFetchMovies handles all fetching logic
+import useFetchMovies from "../hooks/useFetchMovies";
 
 // ─── 3. HOME COMPONENT ──────────────────────────────────────
 function Home() {
-  // ─── 4. STATES ──────────────────────────────────────────
-  const [search, setSearch] = useState(""); // what user types
-  const [movies, setMovies] = useState([]); // movies from API
-  const [loading, setLoading] = useState(false); // show/hide loading
-  const [error, setError] = useState(""); // show/hide error
+  // ─── 4. CUSTOM HOOK ───────────────────────────────────────
+  // ONE LINE replaces all fetch logic!
+  // We get movies, loading, error, fetchMovies from the hook
+  const { movies, loading, error, fetchMovies } = useFetchMovies("Marvel");
 
-  // ─── 5. REF ─────────────────────────────────────────────
-  // Remote control for the search input element
-  // We use it to auto focus and keep focus after search
+  // ─── 5. LOCAL STATE ───────────────────────────────────────
+  // search stays here — it belongs to UI not fetch logic
+  const [search, setSearch] = useState("");
+
+  // ─── 6. REF ───────────────────────────────────────────────
+  // Remote control for search input
   const searchRef = useRef(null);
 
-  // ─── 6. FETCH MOVIES ────────────────────────────────────
-  // Sends request to OMDB API and saves movies in state
-  // async → because we use await inside
-  const fetchMovies = async (query) => {
-    setLoading(true); // 6a. show loading text
-    setError(""); // 6b. clear previous error
-
-    try {
-      // 6c. Send request to OMDB API with search query and key
-      const response = await fetch(
-        `https://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`,
-      );
-
-      // 6d. Convert response to JavaScript object
-      const data = await response.json();
-
-      // 6e. Check if movies were found
-      if (data.Response === "True") {
-        setMovies(data.Search); // 6f. save movies → UI updates
-      } else {
-        setError("No movies found!"); // 6g. show error
-      }
-    } catch {
-      // 6h. Network error or API down
-      setError("Something went wrong!");
-    }
-
-    setLoading(false); // 6i. hide loading text
-  };
-
-  // ─── 7. USE EFFECT ──────────────────────────────────────
-  // Runs ONCE when page first loads
-  // [] → empty array means only runs on mount
-  useEffect(() => {
-    fetchMovies("Marvel"); // 7a. load Marvel movies by default
-    searchRef.current.focus(); // 7b. auto focus search input
-  }, []);
-
-  // ─── 8. SEARCH FUNCTION ─────────────────────────────────
-  // Runs when user clicks Search or presses Enter
+  // ─── 7. SEARCH FUNCTION ───────────────────────────────────
+  // Calls fetchMovies from our custom hook
   const searchMovies = () => {
-    if (!search) return; // 8a. ignore if input empty
-    fetchMovies(search); // 8b. fetch with user's query
-    searchRef.current.focus(); // 8c. keep focus on input
+    if (!search) return; // 7a. ignore if empty
+    fetchMovies(search); // 7b. fetch with user query
+    searchRef.current.focus(); // 7c. keep focus on input
   };
 
-  // ─── 9. UI ──────────────────────────────────────────────
+  // ─── 8. UI ────────────────────────────────────────────────
   return (
     <div className="p-8">
-      {/* ── 9a. SEARCH BOX ────────────────────────────── */}
+      {/* ── 8a. SEARCH BOX ────────────────────────────── */}
       <div className="flex gap-4 max-w-xl mx-auto mb-8">
-        {/* Input — ref attaches remote control to this element */}
+        {/* Input */}
         <input
           ref={searchRef}
           type="text"
@@ -94,26 +58,24 @@ function Home() {
         </button>
       </div>
 
-      {/* ── 9b. LOADING — only shows when loading is true ── */}
+      {/* ── 8b. LOADING ───────────────────────────────── */}
       {loading && (
         <p className="text-center text-gray-400 text-xl mb-4">Loading...</p>
       )}
 
-      {/* ── 9c. ERROR — only shows when error has message ── */}
+      {/* ── 8c. ERROR ─────────────────────────────────── */}
       {error && (
         <p className="text-center text-red-400 text-xl mb-4">{error}</p>
       )}
 
-      {/* ── 9d. MOVIES GRID ───────────────────────────────── */}
-      {/* Responsive: 1 col → 2 col → 3 col → 4 col */}
+      {/* ── 8d. MOVIES GRID ───────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {/* Loop through movies — each becomes a card */}
         {movies.map((movie) => (
           <div
             key={movie.imdbID}
             className="bg-gray-800 rounded-xl overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer"
           >
-            {/* Poster — show placeholder if no poster */}
+            {/* Poster */}
             <img
               src={
                 movie.Poster !== "N/A"
@@ -139,5 +101,5 @@ function Home() {
 }
 // ── END OF HOME COMPONENT ───────────────────────────────────
 
-// ─── 10. EXPORT ─────────────────────────────────────────────
+// ─── 9. EXPORT ──────────────────────────────────────────────
 export default Home;
