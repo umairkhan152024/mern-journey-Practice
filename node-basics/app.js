@@ -1,43 +1,50 @@
 // ════════════════════════════════════════════════════════════
-//  FIRST EXPRESS SERVER
-//  This is the simplest possible web server
+//  EXPRESS SERVER — WITH MIDDLEWARE
+//  Umair Khan | ZENOVA | MERN Stack Journey
 // ════════════════════════════════════════════════════════════
 
-// ─── 1. IMPORT EXPRESS ──────────────────────────────────────
-// require() = Node.js way of importing packages
-// Like import in React but older syntax
+// ─── 1. IMPORTS ─────────────────────────────────────────────
 const express = require("express");
 
 // ─── 2. CREATE SERVER ───────────────────────────────────────
-// app = our server instance
-// All routes and settings go through app
 const app = express();
 
 // ─── 3. PORT ────────────────────────────────────────────────
-// Port = door number our server listens on
-// 3000 is standard for Node.js/Express
 const PORT = 3000;
 
-// ─── 4. ROUTES ──────────────────────────────────────────────
-// Route = when someone visits this URL, do this!
-// app.get(URL, function(req, res))
-// req = request  → what browser sent to server
-// res = response → what server sends back to browser
+// ─── 4. MIDDLEWARE ──────────────────────────────────────────
+// Middleware 1 — express.json()
+// Allows server to READ JSON data sent from browser
+// Without this → req.body is undefined!
+app.use(express.json());
 
-// Route 1 — Home page
-app.get("/", (req, res) => {
-  // res.send() → sends text back to browser
-  res.send("Welcome to ZENOVA API!");
+// Middleware 2 — Custom logger
+// Runs on EVERY request before reaching any route
+// req.method → GET, POST, PUT, DELETE
+// req.url    → /, /movies, /about
+app.use((req, res, next) => {
+  // ── 4a. Log every request ─────────────────────────────
+  console.log(`Request: ${req.method} ${req.url}`);
+
+  // ── 4b. next() → move to next middleware or route ─────
+  // Without next() → request gets STUCK here forever!
+  next();
 });
 
-// Route 2 — About page
+// ─── 5. ROUTES ──────────────────────────────────────────────
+
+// ── Route 1 — Home ────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.send("Welcome to ZENOVA API! — Nodemon is watching!");
+});
+
+// ── Route 2 — About ───────────────────────────────────────
 app.get("/about", (req, res) => {
   res.send("ZENOVA — Healthcare Digital Agency");
 });
 
-// Route 3 — Movies page — sends JSON data
+// ── Route 3 — Movies ──────────────────────────────────────
 app.get("/movies", (req, res) => {
-  // res.json() → sends JSON data back to browser
   res.json({
     success: true,
     data: [
@@ -48,9 +55,7 @@ app.get("/movies", (req, res) => {
   });
 });
 
-// ─── 5. START SERVER ────────────────────────────────────────
-// app.listen() → starts the server on PORT 3000
-// () => console.log → runs when server successfully starts
+// ─── 6. START SERVER ────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
