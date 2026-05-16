@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// ============================================
+// FILE: src/App.jsx
+// PURPOSE: Root component — the main page frame
+// ============================================
+
+import DoctorList from "./components/DoctorList";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+    // This outer div is the FULL PAGE wrapper
+    // width: "100%" means stretch to fill the entire browser window
+    // minHeight: "100vh" means at least full screen height
+    // vh = viewport height — 100vh = 100% of screen height
+    <div
+      style={{ width: "100%", minHeight: "100vh", backgroundColor: "#f5f5f5" }}
+    >
+      {/* ===================== */}
+      {/* HEADER SECTION        */}
+      {/* ===================== */}
+
+      {/* width: "100%" makes the header stretch full width */}
+      {/* boxSizing: "border-box" means padding is INCLUDED in the width */}
+      {/* Without this, padding adds EXTRA width and breaks layout */}
+      <div
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          backgroundColor: "#1a1a2e",
+          color: "white",
+          padding: "28px 40px",
+          fontFamily: "sans-serif",
+        }}
+      >
+        {/* Clinic name */}
+        <h1 style={{ margin: 0, fontSize: "26px", fontWeight: "700" }}>
+          ZENOVA Clinic
+        </h1>
+
+        {/* Subtitle */}
+        <p style={{ margin: "6px 0 0", color: "#aaaaaa", fontSize: "14px" }}>
+          Find and book the best doctors in Islamabad
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      {/* End of header */}
+
+      {/* ===================== */}
+      {/* MAIN CONTENT SECTION  */}
+      {/* ===================== */}
+
+      {/* DoctorList lives here */}
+      {/* It contains the 3-column grid of doctor cards */}
+      <DoctorList />
+    </div>
+    // End of full page wrapper
+  );
 }
 
-export default App
+export default App;
