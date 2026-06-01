@@ -1,41 +1,75 @@
 // ============================================
 // FILE: src/App.jsx
-// GOAL: Practice components and props
+// NEW CONCEPT: Conditional rendering
+// We added one new prop: isAvailable (true/false)
+// Based on that we show green or red badge
 // ============================================
 
-// COMPONENT 1 — DoctorCard
-// A component is just a function that returns JSX
-// This component receives 3 props: name, specialty, fee
-// Props are like arguments — we pass data into the component
+function DoctorCard({ name, specialty, fee, isAvailable }) {
+  // isAvailable is a boolean — true or false
+  // We use it to show different badge colors
 
-function DoctorCard({ name, specialty, fee }) {
   return (
-    // One root div — JSX must have one root element
     <div
       style={{
-        border: "1px solid #dd3c3c",
+        border: "1px solid #ddd",
         borderRadius: "8px",
         padding: "16px",
         marginBottom: "12px",
         fontFamily: "sans-serif",
       }}
     >
-      {/* {name} — curly braces show JavaScript value in JSX */}
+      {/* Doctor name */}
       <h2 style={{ margin: "0 0 8px", color: "#1a1a2e" }}>{name}</h2>
 
-      {/* {specialty} — reads the specialty prop */}
+      {/* Specialty */}
       <p style={{ margin: "4px 0", color: "#555" }}>{specialty}</p>
 
-      {/* {fee} — reads the fee number prop */}
+      {/* Fee */}
       <p style={{ margin: "4px 0", fontWeight: "500" }}>Rs. {fee}</p>
+
+      {/* =============================================
+          CONDITIONAL RENDERING
+          isAvailable ? show this : show that
+          if isAvailable is true  → green badge
+          if isAvailable is false → red badge
+          ============================================= */}
+      {isAvailable ? (
+        // true — show green badge
+        <span
+          style={{
+            display: "inline-block",
+            marginTop: "10px",
+            padding: "4px 12px",
+            backgroundColor: "#e1f5ee", // light green
+            color: "#0f6e56", // dark green text
+            borderRadius: "20px",
+            fontSize: "13px",
+            fontWeight: "500",
+          }}
+        >
+          Available Today
+        </span>
+      ) : (
+        // false — show red badge
+        <span
+          style={{
+            display: "inline-block",
+            marginTop: "10px",
+            padding: "4px 12px",
+            backgroundColor: "#fcebeb", // light red
+            color: "#a32d2d", // dark red text
+            borderRadius: "20px",
+            fontSize: "13px",
+            fontWeight: "500",
+          }}
+        >
+          Not Available
+        </span>
+      )}
     </div>
   );
 }
-
-// COMPONENT 2 — App
-// App is the parent component
-// It uses DoctorCard three times with different props
-// Same component — different data — different result
 
 function App() {
   return (
@@ -50,15 +84,28 @@ function App() {
         ZENOVA Clinic
       </h1>
 
-      {/* DoctorCard used 3 times — each with different props */}
-      <DoctorCard name="Dr. Ahmed Khan" specialty="Cardiologist" fee={2000} />
+      {/* isAvailable={true}  → green badge */}
+      <DoctorCard
+        name="Dr. Ahmed Khan"
+        specialty="Cardiologist"
+        fee={2000}
+        isAvailable={true}
+      />
 
-      <DoctorCard name="Dr. Sara Malik" specialty="Dentist" fee={1500} />
+      {/* isAvailable={false} → red badge */}
+      <DoctorCard
+        name="Dr. Sara Malik"
+        specialty="Dentist"
+        fee={1500}
+        isAvailable={false}
+      />
 
+      {/* isAvailable={true}  → green badge */}
       <DoctorCard
         name="Dr. Bilal Akhtar"
         specialty="Skin Specialist"
         fee={1800}
+        isAvailable={true}
       />
     </div>
   );
