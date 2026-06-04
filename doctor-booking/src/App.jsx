@@ -1,298 +1,263 @@
 // ============================================
 // FILE: src/App.jsx
-// PIECE 6 OF 6 — Complete form with dropdown
+// STAGE 3 — PIECE 5 OF 5 — FINAL
 // ============================================
-// GOAL: add one more field — select dropdown
-// for choosing a doctor
-//
-// NEW THING: select element
-// works EXACTLY like input
-// same name, value, onChange pattern
-// only difference is it shows a dropdown
-// instead of a text box
+// COMBINING EVERYTHING:
+// 1. useEffect with [] — fetch doctors on load
+// 2. loading state — show loading while fetching
+// 3. error state — show error if fetch fails
+// 4. search state — filter doctors by name
+// 5. .map() — render doctor cards from API data
 // ============================================
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+// ============================================
+// COMPONENT: DoctorCard
+// ============================================
+// same as before — receives props and shows card
+// now data comes from API not hardcoded array
+// ============================================
+function DoctorCard({ name, email, phone, city }) {
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "16px",
+        marginBottom: "12px",
+      }}
+    >
+      {/* name from API */}
+      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
+        {name}
+      </h2>
+
+      {/* email from API */}
+      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+        Email: {email}
+      </p>
+
+      {/* phone from API */}
+      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+        Phone: {phone}
+      </p>
+
+      {/* city from API — nested inside address object */}
+      {/* user.address.city is how we access nested data */}
+      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+        City: {city}
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: App
+// ============================================
 function App() {
-  // formData now has THREE fields
-  // name, phone — same as before
-  // doctor — NEW field for selected doctor
-  const [formData, setFormData] = useState({
-    name: "", // patient name
-    phone: "", // phone number
-    doctor: "", // selected doctor — empty at start
-  });
+  // doctors from API — starts empty
+  const [doctors, setDoctors] = useState([]);
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // loading state — true while fetching
+  const [isLoading, setIsLoading] = useState(true);
 
-  // handleChange is exactly the same
-  // it works for ALL inputs including select
-  // because select also has name and value
-  function handleChange(e) {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  }
+  // error state — null means no error
+  const [error, setError] = useState(null);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    setIsSubmitted(true);
-  }
+  // search query — filters doctors by name
+  const [searchQuery, setSearchQuery] = useState("");
 
-  function handleReset() {
-    setFormData({
-      name: "",
-      phone: "",
-      doctor: "", // reset doctor back to empty
-    });
-    setIsSubmitted(false);
-  }
+  // =============================================
+  // useEffect — fetch doctors ONCE on load
+  // =============================================
+  // [] means run only once
+  // when component first mounts
+  // fetches all doctors from API
+  // stores them in doctors state
+  // =============================================
+  useEffect(() => {
+    async function fetchDoctors() {
+      try {
+        // fetch 10 users from fake API
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/users",
+        );
 
-  // success screen
-  if (isSubmitted) {
+        // if response is not ok throw error
+        // this jumps to catch block
+        if (!response.ok) {
+          throw new Error("Could not load doctors. Please try again.");
+        }
+
+        // convert response to JavaScript array
+        const data = await response.json();
+
+        // store in state — React re-renders
+        // doctors array now has 10 items
+        setDoctors(data);
+
+        // data arrived — hide loading
+        setIsLoading(false);
+      } catch (err) {
+        // something went wrong
+        // store error message
+        setError(err.message);
+
+        // hide loading — show error instead
+        setIsLoading(false);
+      }
+    }
+
+    // call the function to start fetching
+    fetchDoctors();
+  }, []);
+  // [] — only runs once when app first loads
+
+  // =============================================
+  // FILTER DOCTORS BY SEARCH
+  // =============================================
+  // not a state — derived value
+  // recalculates every time searchQuery changes
+  // or every time doctors array changes
+  // =============================================
+  const filteredDoctors = doctors.filter((doctor) =>
+    doctor.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // =============================================
+  // RENDER 1 — loading state
+  // =============================================
+  // isLoading is true — data still coming
+  // show loading message
+  // =============================================
+  if (isLoading) {
     return (
       <div
         style={{
-          maxWidth: "400px",
+          maxWidth: "500px",
           margin: "40px auto",
           fontFamily: "sans-serif",
-          padding: "0 16px",
           textAlign: "center",
+          color: "#888",
         }}
       >
-        {/* Green checkmark */}
-        <div
-          style={{
-            width: "64px",
-            height: "64px",
-            borderRadius: "50%",
-            backgroundColor: "#e1f5ee",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 16px",
-            fontSize: "28px",
-            color: "#0f6e56",
-          }}
-        >
-          ✓
-        </div>
-
-        <h2 style={{ color: "#0f6e56", marginBottom: "16px" }}>
-          Appointment Booked!
-        </h2>
-
-        {/* show all three submitted values */}
-        <p style={{ color: "#555", margin: "6px 0" }}>Name: {formData.name}</p>
-        <p style={{ color: "#555", margin: "6px 0" }}>
-          Phone: {formData.phone}
-        </p>
-
-        {/* formData.doctor shows selected doctor name */}
-        <p style={{ color: "#555", margin: "6px 0" }}>
-          Doctor: {formData.doctor}
-        </p>
-
-        <button
-          onClick={handleReset}
-          style={{
-            marginTop: "24px",
-            backgroundColor: "#1a1a2e",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            padding: "12px 28px",
-            fontSize: "14px",
-            cursor: "pointer",
-            fontWeight: "500",
-          }}
-        >
-          Book Another Appointment
-        </button>
+        <p style={{ fontSize: "18px" }}>Loading doctors...</p>
+        <p style={{ fontSize: "14px" }}>Please wait</p>
       </div>
     );
   }
 
-  // main form
+  // =============================================
+  // RENDER 2 — error state
+  // =============================================
+  // error is not null — something went wrong
+  // show error message
+  // =============================================
+  if (error) {
+    return (
+      <div
+        style={{
+          maxWidth: "500px",
+          margin: "40px auto",
+          fontFamily: "sans-serif",
+          padding: "0 16px",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#fcebeb",
+            border: "1px solid #f0a0a0",
+            borderRadius: "8px",
+            padding: "24px",
+            textAlign: "center",
+            color: "#a32d2d",
+          }}
+        >
+          <p style={{ fontSize: "16px", fontWeight: "500", margin: "0 0 8px" }}>
+            Something went wrong
+          </p>
+          <p style={{ fontSize: "14px", margin: 0 }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // =============================================
+  // RENDER 3 — success state
+  // =============================================
+  // no loading, no error
+  // show doctors with search filter
+  // =============================================
   return (
     <div
       style={{
-        maxWidth: "400px",
+        maxWidth: "500px",
         margin: "40px auto",
         fontFamily: "sans-serif",
         padding: "0 16px",
       }}
     >
-      <h1 style={{ color: "#1a1a2e", marginBottom: "24px" }}>
-        Book an Appointment
-      </h1>
+      {/* HEADER */}
+      <h1 style={{ color: "#1a1a2e", marginBottom: "4px" }}>ZENOVA Clinic</h1>
+      <p style={{ color: "#888", fontSize: "14px", marginBottom: "24px" }}>
+        {doctors.length} doctors loaded from API
+      </p>
 
-      <form
-        onSubmit={handleSubmit}
+      {/* SEARCH INPUT */}
+      {/* connected to searchQuery state */}
+      {/* filters doctors in real time */}
+      <input
+        type="text"
+        placeholder="Search doctor by name..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         style={{
-          backgroundColor: "white",
+          width: "100%",
+          padding: "10px 14px",
+          fontSize: "14px",
           border: "1px solid #ddd",
           borderRadius: "8px",
-          padding: "24px",
+          marginBottom: "8px",
+          boxSizing: "border-box",
+          outline: "none",
         }}
-      >
-        {/* INPUT 1 — name */}
-        {/* no change from before */}
-        <div style={{ marginBottom: "14px" }}>
-          <label
-            htmlFor="name"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "#333",
-            }}
-          >
-            Patient Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your full name"
-            required
-            style={{
-              width: "100%",
-              padding: "10px 14px",
-              fontSize: "14px",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              boxSizing: "border-box",
-              outline: "none",
-            }}
+      />
+
+      {/* results count */}
+      <p style={{ color: "#888", fontSize: "13px", marginBottom: "16px" }}>
+        Showing {filteredDoctors.length} doctors
+      </p>
+
+      {/* DOCTOR LIST */}
+      {/* if filteredDoctors has items — show cards */}
+      {/* if empty — show no results message */}
+      {filteredDoctors.length > 0 ? (
+        filteredDoctors.map((doctor) => (
+          <DoctorCard
+            key={doctor.id}
+            name={doctor.name}
+            email={doctor.email}
+            phone={doctor.phone}
+            city={doctor.address.city}
           />
-        </div>
-
-        {/* INPUT 2 — phone */}
-        {/* no change from before */}
-        <div style={{ marginBottom: "14px" }}>
-          <label
-            htmlFor="phone"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "#333",
-            }}
-          >
-            Phone Number
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="03XX-XXXXXXX"
-            required
-            style={{
-              width: "100%",
-              padding: "10px 14px",
-              fontSize: "14px",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              boxSizing: "border-box",
-              outline: "none",
-            }}
-          />
-        </div>
-
-        {/* =============================================
-            SELECT — doctor dropdown
-            =============================================
-            select works EXACTLY like input
-            same pattern:
-              name="doctor"         → field identifier
-              value={formData.doctor} → controlled by state
-              onChange={handleChange} → updates state
-              required              → cannot submit empty
-            
-            inside select we put option elements
-            each option has a value
-            when user selects one:
-              e.target.value = that option's value
-              formData.doctor updates to that value
-            ============================================= */}
-        <div style={{ marginBottom: "24px" }}>
-          <label
-            htmlFor="doctor"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "#333",
-            }}
-          >
-            Select Doctor
-          </label>
-
-          <select
-            id="doctor"
-            name="doctor"
-            value={formData.doctor}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "10px 14px",
-              fontSize: "14px",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              boxSizing: "border-box",
-              outline: "none",
-              backgroundColor: "white",
-            }}
-          >
-            {/* default option — value is empty string */}
-            {/* required means this cannot be selected on submit */}
-            <option value="">-- Select a doctor --</option>
-
-            {/* each option value is the doctor name */}
-            {/* when selected formData.doctor = this value */}
-            <option value="Dr. Ahmed Khan">
-              Dr. Ahmed Khan — Cardiologist
-            </option>
-            <option value="Dr. Sara Malik">Dr. Sara Malik — Dentist</option>
-            <option value="Dr. Bilal Akhtar">
-              Dr. Bilal Akhtar — Skin Specialist
-            </option>
-            <option value="Dr. Fatima Noor">
-              Dr. Fatima Noor — Gynecologist
-            </option>
-            <option value="Dr. Usman Ali">Dr. Usman Ali — Neurologist</option>
-          </select>
-        </div>
-
-        {/* SUBMIT BUTTON */}
-        <button
-          type="submit"
+        ))
+      ) : (
+        <div
           style={{
-            width: "100%",
-            backgroundColor: "#1a1a2e",
-            color: "white",
-            border: "none",
+            textAlign: "center",
+            padding: "40px",
+            color: "#aaa",
+            fontSize: "14px",
+            border: "1px solid #ddd",
             borderRadius: "8px",
-            padding: "12px",
-            fontSize: "15px",
-            fontWeight: "500",
-            cursor: "pointer",
+            backgroundColor: "white",
           }}
         >
-          Book Appointment
-        </button>
-      </form>
+          No doctors found for "{searchQuery}"
+        </div>
+      )}
     </div>
   );
 }
