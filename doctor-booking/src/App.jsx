@@ -1,204 +1,100 @@
 // ============================================
 // FILE: src/App.jsx
-// NEW CONCEPT: Forms
+// PIECE 6 OF 6 — Complete form with dropdown
 // ============================================
-// A form in React works like this:
+// GOAL: add one more field — select dropdown
+// for choosing a doctor
 //
-// User types in input
-//   → onChange fires
-//     → setState updates
-//       → React re-renders
-//         → input shows new value
-//
-// User clicks submit
-//   → onSubmit fires
-//     → e.preventDefault() stops page refresh
-//       → we read data from state
-//         → we show success message
+// NEW THING: select element
+// works EXACTLY like input
+// same name, value, onChange pattern
+// only difference is it shows a dropdown
+// instead of a text box
 // ============================================
 
-// import useState — we need it for form data
 import { useState } from "react";
 
-// ============================================
-// COMPONENT: BookingForm
-// ============================================
-// This component has its own state
-// It manages all the form fields
-// and the submission process
-// ============================================
-
-function BookingForm() {
-  // =============================================
-  // STATE 1 — formData object
-  // =============================================
-  // We store ALL form fields in ONE state object
-  // This is the standard pattern for forms
-  //
-  // Instead of:
-  //   const [name, setName] = useState("")
-  //   const [phone, setPhone] = useState("")
-  //   const [doctor, setDoctor] = useState("")
-  //
-  // We do ONE state object with all fields:
-  //   formData.name   → patient name field
-  //   formData.phone  → phone number field
-  //   formData.doctor → selected doctor field
-  //
-  // All fields start as empty string ""
-  // =============================================
+function App() {
+  // formData now has THREE fields
+  // name, phone — same as before
+  // doctor — NEW field for selected doctor
   const [formData, setFormData] = useState({
-    name: "", // patient name — empty at start
-    phone: "", // phone number — empty at start
+    name: "", // patient name
+    phone: "", // phone number
     doctor: "", // selected doctor — empty at start
   });
 
-  // =============================================
-  // STATE 2 — isSubmitted boolean
-  // =============================================
-  // false → show the form
-  // true  → show the success message
-  // starts as false because form shows first
-  // =============================================
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // =============================================
-  // FUNCTION: handleChange
-  // =============================================
-  // This ONE function handles ALL input changes
-  // We do not need a separate function for each input
-  //
-  // HOW IT WORKS:
-  // e.target.name  → which input field changed
-  //                  this matches the name="" attribute
-  //                  on each input element
-  // e.target.value → what the user typed
-  //
-  // ...formData → spread operator
-  //               keeps all existing field values
-  //               only updates the one that changed
-  //
-  // EXAMPLE:
-  // user types "Umair" in name field
-  //   e.target.name  = "name"
-  //   e.target.value = "Umair"
-  //   result: { name: "Umair", phone: "", doctor: "" }
-  //
-  // user types "0300" in phone field
-  //   e.target.name  = "phone"
-  //   e.target.value = "0300"
-  //   result: { name: "Umair", phone: "0300", doctor: "" }
-  // =============================================
+  // handleChange is exactly the same
+  // it works for ALL inputs including select
+  // because select also has name and value
   function handleChange(e) {
     setFormData({
-      ...formData, // keep all existing values
-      [e.target.name]: e.target.value, // update only the changed field
+      ...formData,
+      [e.target.name]: e.target.value,
     });
   }
 
-  // =============================================
-  // FUNCTION: handleSubmit
-  // =============================================
-  // This runs when user clicks the submit button
-  //
-  // STEP 1: e.preventDefault()
-  //   By default, when a form submits
-  //   the browser refreshes the entire page
-  //   This destroys all React state
-  //   preventDefault() stops that from happening
-  //   ALWAYS write this as the very first line
-  //
-  // STEP 2: setIsSubmitted(true)
-  //   Changes isSubmitted state to true
-  //   React re-renders
-  //   We show success message instead of form
-  // =============================================
   function handleSubmit(e) {
-    // STEP 1 — stop browser page refresh
-    // always first line in handleSubmit
     e.preventDefault();
-
-    // STEP 2 — mark form as submitted
-    // this triggers showing the success message
     setIsSubmitted(true);
   }
 
-  // =============================================
-  // FUNCTION: handleReset
-  // =============================================
-  // Runs when user clicks "Book Another"
-  // Resets all form fields back to empty
-  // Sets isSubmitted back to false
-  // Shows the form again
-  // =============================================
   function handleReset() {
-    // reset all fields to empty string
     setFormData({
       name: "",
       phone: "",
-      doctor: "",
+      doctor: "", // reset doctor back to empty
     });
-
-    // hide success message, show form again
     setIsSubmitted(false);
   }
 
-  // =============================================
-  // CONDITIONAL RENDER — success message
-  // =============================================
-  // if isSubmitted is true
-  // return the success screen EARLY
-  // the form below never renders
-  // this pattern is called "early return"
-  // =============================================
+  // success screen
   if (isSubmitted) {
     return (
-      // Success screen wrapper
       <div
         style={{
-          maxWidth: "500px",
+          maxWidth: "400px",
           margin: "40px auto",
-          padding: "0 16px",
           fontFamily: "sans-serif",
+          padding: "0 16px",
           textAlign: "center",
         }}
       >
-        {/* Green checkmark circle */}
+        {/* Green checkmark */}
         <div
           style={{
             width: "64px",
             height: "64px",
-            borderRadius: "50%", // makes it a circle
-            backgroundColor: "#e1f5ee", // light green
+            borderRadius: "50%",
+            backgroundColor: "#e1f5ee",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 16px",
             fontSize: "28px",
+            color: "#0f6e56",
           }}
         >
           ✓
         </div>
 
-        {/* Success title */}
-        <h2 style={{ color: "#0f6e56", marginBottom: "8px" }}>
+        <h2 style={{ color: "#0f6e56", marginBottom: "16px" }}>
           Appointment Booked!
         </h2>
 
-        {/* Show the data user submitted */}
-        {/* We read from formData state */}
-        {/* Even after submit, state still holds the values */}
-        <p style={{ color: "#555", margin: "6px 0" }}>
-          Patient: {formData.name}
-        </p>
+        {/* show all three submitted values */}
+        <p style={{ color: "#555", margin: "6px 0" }}>Name: {formData.name}</p>
         <p style={{ color: "#555", margin: "6px 0" }}>
           Phone: {formData.phone}
         </p>
+
+        {/* formData.doctor shows selected doctor name */}
         <p style={{ color: "#555", margin: "6px 0" }}>
           Doctor: {formData.doctor}
         </p>
 
-        {/* Reset button — goes back to form */}
         <button
           onClick={handleReset}
           style={{
@@ -218,36 +114,21 @@ function BookingForm() {
       </div>
     );
   }
-  // end of early return
 
-  // =============================================
-  // MAIN FORM RENDER
-  // =============================================
-  // This only renders when isSubmitted is false
-  // which is the default state
-  // =============================================
+  // main form
   return (
     <div
       style={{
-        maxWidth: "500px",
+        maxWidth: "400px",
         margin: "40px auto",
-        padding: "0 16px",
         fontFamily: "sans-serif",
+        padding: "0 16px",
       }}
     >
-      {/* Page title */}
       <h1 style={{ color: "#1a1a2e", marginBottom: "24px" }}>
         Book an Appointment
       </h1>
 
-      {/* =============================================
-          THE FORM ELEMENT
-          =============================================
-          onSubmit={handleSubmit}
-          → when user clicks submit button
-          → or presses Enter key
-          → handleSubmit function runs
-          ============================================= */}
       <form
         onSubmit={handleSubmit}
         style={{
@@ -257,18 +138,13 @@ function BookingForm() {
           padding: "24px",
         }}
       >
-        {/* ========================= */}
-        {/* INPUT 1 — Patient Name    */}
-        {/* ========================= */}
-        <div style={{ marginBottom: "16px" }}>
-          {/* label — tells user what this field is */}
-          {/* htmlFor="name" connects label to input */}
-          {/* htmlFor in JSX = for in HTML */}
-          {/* clicking label focuses the input */}
+        {/* INPUT 1 — name */}
+        {/* no change from before */}
+        <div style={{ marginBottom: "14px" }}>
           <label
             htmlFor="name"
             style={{
-              display: "block", // label on its own line
+              display: "block",
               marginBottom: "6px",
               fontSize: "14px",
               fontWeight: "500",
@@ -277,16 +153,6 @@ function BookingForm() {
           >
             Patient Name
           </label>
-
-          {/* CONTROLLED INPUT */}
-          {/* name="name" → matches formData.name key */}
-          {/*               handleChange uses this to know */}
-          {/*               which field to update */}
-          {/* value={formData.name} → input shows state value */}
-          {/*                         state controls the input */}
-          {/* onChange={handleChange} → fires on every keystroke */}
-          {/*                           updates formData.name */}
-          {/* required → cannot submit if empty */}
           <input
             id="name"
             type="text"
@@ -306,12 +172,10 @@ function BookingForm() {
             }}
           />
         </div>
-        {/* end of name field */}
 
-        {/* ========================= */}
-        {/* INPUT 2 — Phone Number    */}
-        {/* ========================= */}
-        <div style={{ marginBottom: "16px" }}>
+        {/* INPUT 2 — phone */}
+        {/* no change from before */}
+        <div style={{ marginBottom: "14px" }}>
           <label
             htmlFor="phone"
             style={{
@@ -324,10 +188,6 @@ function BookingForm() {
           >
             Phone Number
           </label>
-
-          {/* name="phone" → matches formData.phone */}
-          {/* value={formData.phone} → controlled by state */}
-          {/* onChange={handleChange} → updates formData.phone */}
           <input
             id="phone"
             type="tel"
@@ -347,11 +207,23 @@ function BookingForm() {
             }}
           />
         </div>
-        {/* end of phone field */}
 
-        {/* ========================= */}
-        {/* INPUT 3 — Select Doctor   */}
-        {/* ========================= */}
+        {/* =============================================
+            SELECT — doctor dropdown
+            =============================================
+            select works EXACTLY like input
+            same pattern:
+              name="doctor"         → field identifier
+              value={formData.doctor} → controlled by state
+              onChange={handleChange} → updates state
+              required              → cannot submit empty
+            
+            inside select we put option elements
+            each option has a value
+            when user selects one:
+              e.target.value = that option's value
+              formData.doctor updates to that value
+            ============================================= */}
         <div style={{ marginBottom: "24px" }}>
           <label
             htmlFor="doctor"
@@ -366,11 +238,6 @@ function BookingForm() {
             Select Doctor
           </label>
 
-          {/* select = dropdown element */}
-          {/* works exactly like input */}
-          {/* name="doctor" → matches formData.doctor */}
-          {/* value={formData.doctor} → controlled by state */}
-          {/* onChange={handleChange} → updates formData.doctor */}
           <select
             id="doctor"
             name="doctor"
@@ -388,12 +255,12 @@ function BookingForm() {
               backgroundColor: "white",
             }}
           >
-            {/* default empty option */}
-            {/* value="" means nothing selected yet */}
+            {/* default option — value is empty string */}
+            {/* required means this cannot be selected on submit */}
             <option value="">-- Select a doctor --</option>
 
-            {/* each option has a value */}
-            {/* when selected, formData.doctor = that value */}
+            {/* each option value is the doctor name */}
+            {/* when selected formData.doctor = this value */}
             <option value="Dr. Ahmed Khan">
               Dr. Ahmed Khan — Cardiologist
             </option>
@@ -407,14 +274,8 @@ function BookingForm() {
             <option value="Dr. Usman Ali">Dr. Usman Ali — Neurologist</option>
           </select>
         </div>
-        {/* end of doctor select */}
 
-        {/* ========================= */}
-        {/* SUBMIT BUTTON             */}
-        {/* ========================= */}
-        {/* type="submit" → clicking this */}
-        {/* triggers the form onSubmit   */}
-        {/* which runs handleSubmit      */}
+        {/* SUBMIT BUTTON */}
         <button
           type="submit"
           style={{
@@ -432,23 +293,6 @@ function BookingForm() {
           Book Appointment
         </button>
       </form>
-      {/* end of form */}
-    </div>
-  );
-}
-// end of BookingForm component
-
-// ============================================
-// COMPONENT: App
-// ============================================
-// App just renders BookingForm
-// BookingForm manages its own state internally
-// This is called LOCAL STATE
-// ============================================
-function App() {
-  return (
-    <div>
-      <BookingForm />
     </div>
   );
 }
