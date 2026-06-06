@@ -1,49 +1,176 @@
 // ============================================
 // FILE: src/App.jsx
-// STAGE 4 — PIECE 3 OF 4
+// STAGE 4 — PIECE 4 OF 4 — FINAL
 // ============================================
-// GOAL: combine useState with Context
+// REAL WORLD USE CASE:
+// Logged in user stored in Context
+// Any component reads it directly
 //
-// When state changes → Context value updates
-// → every component reading Context updates too
+// FLOW:
+// User clicks Login → user state updates
+// → Context updates
+// → Header shows user name
+// → DoctorCard shows "Book as Umair"
+// → Footer shows user email
 //
-// REAL EXAMPLE:
-// User clicks "Change City" button
-// City changes in state
-// Header and Footer both update automatically
-// because they read city from Context
+// User clicks Logout → user state = null
+// → Context updates
+// → everything shows "not logged in"
 // ============================================
 
 import { createContext, useContext, useState } from "react";
 
 // create the noticeboard
-const ClinicContext = createContext();
+const UserContext = createContext();
 
 // ============================================
 // COMPONENT: Header
 // ============================================
-// reads clinicName and city from Context
-// when Context updates — this updates too
-// ============================================
 function Header() {
-  const { clinicName, city } = useContext(ClinicContext);
+  // read user and logout function from Context
+  const { user, logout } = useContext(UserContext);
 
   return (
     <div
       style={{
         backgroundColor: "#1a1a2e",
         color: "white",
-        padding: "20px",
+        padding: "16px 20px",
         borderRadius: "8px",
         marginBottom: "16px",
         fontFamily: "sans-serif",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
       }}
     >
-      <h1 style={{ margin: "0 0 4px", fontSize: "20px" }}>{clinicName}</h1>
-      {/* city from Context */}
-      {/* when city state changes in App */}
-      {/* this updates automatically */}
-      <p style={{ margin: 0, color: "#aaa", fontSize: "14px" }}>{city}</p>
+      <h1 style={{ margin: 0, fontSize: "18px" }}>ZENOVA Clinic</h1>
+
+      {/* =============================================
+          CONDITIONAL RENDERING WITH CONTEXT
+          if user is not null — show name and logout
+          if user is null — show "not logged in"
+          ============================================= */}
+      {user ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {/* user.name from Context */}
+          <p style={{ margin: 0, color: "#aaa", fontSize: "13px" }}>
+            {user.name}
+          </p>
+
+          {/* logout button — calls logout from Context */}
+          <button
+            onClick={logout}
+            style={{
+              backgroundColor: "transparent",
+              color: "#aaa",
+              border: "1px solid #aaa",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "12px",
+              cursor: "pointer",
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <p style={{ margin: 0, color: "#aaa", fontSize: "13px" }}>
+          Not logged in
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: DoctorCard
+// ============================================
+function DoctorCard({ name, specialty, fee }) {
+  // read user from Context
+  const { user } = useContext(UserContext);
+
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "16px",
+        marginBottom: "12px",
+        fontFamily: "sans-serif",
+      }}
+    >
+      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
+        {name}
+      </h2>
+      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+        {specialty}
+      </p>
+      <p style={{ margin: "4px 0", fontSize: "14px", fontWeight: "500" }}>
+        Rs. {fee}
+      </p>
+
+      {/* =============================================
+          if user is logged in — show Book button
+          if not logged in — show Login required
+          ============================================= */}
+      {user ? (
+        <button
+          style={{
+            marginTop: "12px",
+            backgroundColor: "#1a1a2e",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            fontSize: "13px",
+            cursor: "pointer",
+          }}
+        >
+          {/* user.name from Context — no props needed */}
+          Book as {user.name}
+        </button>
+      ) : (
+        <p
+          style={{
+            marginTop: "12px",
+            color: "#a32d2d",
+            fontSize: "13px",
+          }}
+        >
+          Please login to book
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: DoctorList
+// ============================================
+function DoctorList() {
+  const doctors = [
+    { id: 1, name: "Dr. Ahmed Khan", specialty: "Cardiologist", fee: 2000 },
+    { id: 2, name: "Dr. Sara Malik", specialty: "Dentist", fee: 1500 },
+    {
+      id: 3,
+      name: "Dr. Bilal Akhtar",
+      specialty: "Skin Specialist",
+      fee: 1800,
+    },
+  ];
+
+  return (
+    <div>
+      {doctors.map((doctor) => (
+        <DoctorCard
+          key={doctor.id}
+          name={doctor.name}
+          specialty={doctor.specialty}
+          fee={doctor.fee}
+        />
+      ))}
     </div>
   );
 }
@@ -51,11 +178,9 @@ function Header() {
 // ============================================
 // COMPONENT: Footer
 // ============================================
-// also reads city from Context
-// also updates when city changes
-// ============================================
 function Footer() {
-  const { city } = useContext(ClinicContext);
+  // read user from Context
+  const { user } = useContext(UserContext);
 
   return (
     <div
@@ -69,32 +194,100 @@ function Footer() {
         textAlign: "center",
       }}
     >
-      {/* city from Context */}
-      Currently serving patients in {city}
+      {/* if logged in show email — if not show message */}
+      {user ? (
+        <p style={{ margin: 0 }}>Logged in as {user.email}</p>
+      ) : (
+        <p style={{ margin: 0 }}>Please login to access all features</p>
+      )}
     </div>
   );
 }
 
 // ============================================
-// COMPONENT: App
+// COMPONENT: LoginForm
+// ============================================
+// shows when user is NOT logged in
+// calls login function from Context
+// ============================================
+function LoginForm() {
+  // read login function from Context
+  const { login } = useContext(UserContext);
+
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "24px",
+        marginBottom: "16px",
+        fontFamily: "sans-serif",
+        textAlign: "center",
+      }}
+    >
+      <h2 style={{ color: "#1a1a2e", marginBottom: "16px" }}>
+        Login to ZENOVA
+      </h2>
+
+      {/* clicking this calls login from Context */}
+      {/* sets user state in App */}
+      {/* every component updates */}
+      <button
+        onClick={login}
+        style={{
+          backgroundColor: "#1D9E75",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          padding: "12px 28px",
+          fontSize: "14px",
+          cursor: "pointer",
+          fontWeight: "500",
+        }}
+      >
+        Login as Umair Khan
+      </button>
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: App — THE PRINCIPAL
 // ============================================
 function App() {
   // =============================================
-  // STATE — city
+  // USER STATE
   // =============================================
-  // city is stored in useState
-  // it is passed into Context Provider as value
-  //
-  // when setCity is called:
-  //   1. city state updates
-  //   2. Context value updates
-  //   3. Header re-renders with new city
-  //   4. Footer re-renders with new city
-  //
-  // ONE state change → EVERY component updates
-  // this is the power of Context + useState
+  // null = not logged in
+  // object = logged in user data
+  // starts as null — nobody logged in
   // =============================================
-  const [city, setCity] = useState("Islamabad");
+  const [user, setUser] = useState(null);
+
+  // =============================================
+  // LOGIN FUNCTION
+  // =============================================
+  // sets user state to a user object
+  // Context updates → all components update
+  // =============================================
+  function login() {
+    setUser({
+      name: "Umair Khan",
+      email: "umair@zenova.com",
+      role: "Admin",
+    });
+  }
+
+  // =============================================
+  // LOGOUT FUNCTION
+  // =============================================
+  // sets user state back to null
+  // Context updates → all components update
+  // =============================================
+  function logout() {
+    setUser(null);
+  }
 
   return (
     <div
@@ -105,100 +298,26 @@ function App() {
       }}
     >
       {/* =============================================
-          PROVIDER — noticeboard
+          PROVIDER
           =============================================
-          value has two things:
-          1. clinicName — static, never changes
-          2. city — comes from state, can change
-
-          when city state changes
-          Provider value updates
-          all components inside re-render
+          sharing 3 things through Context:
+          1. user       → the logged in user object
+          2. login      → function to log in
+          3. logout     → function to log out
+          
+          any component inside can read all 3
           ============================================= */}
-      <ClinicContext.Provider
-        value={{
-          clinicName: "ZENOVA Medical Center",
-          city: city,
-          // city: city means:
-          // left side  = key name in Context
-          // right side = city state value
-        }}
-      >
-        {/* Header reads city from Context */}
+      <UserContext.Provider value={{ user, login, logout }}>
+        {/* Header — shows user name and logout button */}
         <Header />
 
-        {/* =============================================
-            BUTTONS — change city state
-            =============================================
-            when clicked → setCity updates state
-            → Context value updates
-            → Header and Footer both update
-            notice: buttons are NOT inside Header
-            or Footer — they are in App
-            but Header and Footer still update
-            because they read from Context
-            ============================================= */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginBottom: "16px",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* each button sets city to a different value */}
-          <button
-            onClick={() => setCity("Islamabad")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: city === "Islamabad" ? "#1a1a2e" : "white",
-              color: city === "Islamabad" ? "white" : "#1a1a2e",
-              border: "1px solid #1a1a2e",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            Islamabad
-          </button>
+        {/* show LoginForm if not logged in */}
+        {/* show DoctorList if logged in */}
+        {user ? <DoctorList /> : <LoginForm />}
 
-          <button
-            onClick={() => setCity("Lahore")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: city === "Lahore" ? "#1a1a2e" : "white",
-              color: city === "Lahore" ? "white" : "#1a1a2e",
-              border: "1px solid #1a1a2e",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            Lahore
-          </button>
-
-          <button
-            onClick={() => setCity("Karachi")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: city === "Karachi" ? "#1a1a2e" : "white",
-              color: city === "Karachi" ? "white" : "#1a1a2e",
-              border: "1px solid #1a1a2e",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            Karachi
-          </button>
-        </div>
-
-        {/* Footer also reads city from Context */}
+        {/* Footer — shows user email */}
         <Footer />
-      </ClinicContext.Provider>
+      </UserContext.Provider>
     </div>
   );
 }
