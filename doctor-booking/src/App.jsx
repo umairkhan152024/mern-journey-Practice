@@ -1,54 +1,76 @@
 // ============================================
 // FILE: src/App.jsx
-// STAGE 3 — PIECE 5 OF 5 — FINAL
+// STAGE 4 — PIECE 3 OF 4
 // ============================================
-// COMBINING EVERYTHING:
-// 1. useEffect with [] — fetch doctors on load
-// 2. loading state — show loading while fetching
-// 3. error state — show error if fetch fails
-// 4. search state — filter doctors by name
-// 5. .map() — render doctor cards from API data
+// GOAL: combine useState with Context
+//
+// When state changes → Context value updates
+// → every component reading Context updates too
+//
+// REAL EXAMPLE:
+// User clicks "Change City" button
+// City changes in state
+// Header and Footer both update automatically
+// because they read city from Context
 // ============================================
 
-import { useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+
+// create the noticeboard
+const ClinicContext = createContext();
 
 // ============================================
-// COMPONENT: DoctorCard
+// COMPONENT: Header
 // ============================================
-// same as before — receives props and shows card
-// now data comes from API not hardcoded array
+// reads clinicName and city from Context
+// when Context updates — this updates too
 // ============================================
-function DoctorCard({ name, email, phone, city }) {
+function Header() {
+  const { clinicName, city } = useContext(ClinicContext);
+
   return (
     <div
       style={{
-        backgroundColor: "white",
-        border: "1px solid #ddd",
+        backgroundColor: "#1a1a2e",
+        color: "white",
+        padding: "20px",
         borderRadius: "8px",
-        padding: "16px",
-        marginBottom: "12px",
+        marginBottom: "16px",
+        fontFamily: "sans-serif",
       }}
     >
-      {/* name from API */}
-      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
-        {name}
-      </h2>
+      <h1 style={{ margin: "0 0 4px", fontSize: "20px" }}>{clinicName}</h1>
+      {/* city from Context */}
+      {/* when city state changes in App */}
+      {/* this updates automatically */}
+      <p style={{ margin: 0, color: "#aaa", fontSize: "14px" }}>{city}</p>
+    </div>
+  );
+}
 
-      {/* email from API */}
-      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-        Email: {email}
-      </p>
+// ============================================
+// COMPONENT: Footer
+// ============================================
+// also reads city from Context
+// also updates when city changes
+// ============================================
+function Footer() {
+  const { city } = useContext(ClinicContext);
 
-      {/* phone from API */}
-      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-        Phone: {phone}
-      </p>
-
-      {/* city from API — nested inside address object */}
-      {/* user.address.city is how we access nested data */}
-      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-        City: {city}
-      </p>
+  return (
+    <div
+      style={{
+        marginTop: "16px",
+        padding: "16px",
+        borderTop: "1px solid #ddd",
+        fontFamily: "sans-serif",
+        fontSize: "13px",
+        color: "#888",
+        textAlign: "center",
+      }}
+    >
+      {/* city from Context */}
+      Currently serving patients in {city}
     </div>
   );
 }
@@ -57,207 +79,126 @@ function DoctorCard({ name, email, phone, city }) {
 // COMPONENT: App
 // ============================================
 function App() {
-  // doctors from API — starts empty
-  const [doctors, setDoctors] = useState([]);
+  // =============================================
+  // STATE — city
+  // =============================================
+  // city is stored in useState
+  // it is passed into Context Provider as value
+  //
+  // when setCity is called:
+  //   1. city state updates
+  //   2. Context value updates
+  //   3. Header re-renders with new city
+  //   4. Footer re-renders with new city
+  //
+  // ONE state change → EVERY component updates
+  // this is the power of Context + useState
+  // =============================================
+  const [city, setCity] = useState("Islamabad");
 
-  // loading state — true while fetching
-  const [isLoading, setIsLoading] = useState(true);
-
-  // error state — null means no error
-  const [error, setError] = useState(null);
-
-  // search query — filters doctors by name
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // =============================================
-  // useEffect — fetch doctors ONCE on load
-  // =============================================
-  // [] means run only once
-  // when component first mounts
-  // fetches all doctors from API
-  // stores them in doctors state
-  // =============================================
-  useEffect(() => {
-    async function fetchDoctors() {
-      try {
-        // fetch 10 users from fake API
-        const response = await fetch(
-          "https://jsonplaceholder.typicode.com/users",
-        );
-
-        // if response is not ok throw error
-        // this jumps to catch block
-        if (!response.ok) {
-          throw new Error("Could not load doctors. Please try again.");
-        }
-
-        // convert response to JavaScript array
-        const data = await response.json();
-
-        // store in state — React re-renders
-        // doctors array now has 10 items
-        setDoctors(data);
-
-        // data arrived — hide loading
-        setIsLoading(false);
-      } catch (err) {
-        // something went wrong
-        // store error message
-        setError(err.message);
-
-        // hide loading — show error instead
-        setIsLoading(false);
-      }
-    }
-
-    // call the function to start fetching
-    fetchDoctors();
-  }, []);
-  // [] — only runs once when app first loads
-
-  // =============================================
-  // FILTER DOCTORS BY SEARCH
-  // =============================================
-  // not a state — derived value
-  // recalculates every time searchQuery changes
-  // or every time doctors array changes
-  // =============================================
-  const filteredDoctors = doctors.filter((doctor) =>
-    doctor.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  // =============================================
-  // RENDER 1 — loading state
-  // =============================================
-  // isLoading is true — data still coming
-  // show loading message
-  // =============================================
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          maxWidth: "500px",
-          margin: "40px auto",
-          fontFamily: "sans-serif",
-          textAlign: "center",
-          color: "#888",
-        }}
-      >
-        <p style={{ fontSize: "18px" }}>Loading doctors...</p>
-        <p style={{ fontSize: "14px" }}>Please wait</p>
-      </div>
-    );
-  }
-
-  // =============================================
-  // RENDER 2 — error state
-  // =============================================
-  // error is not null — something went wrong
-  // show error message
-  // =============================================
-  if (error) {
-    return (
-      <div
-        style={{
-          maxWidth: "500px",
-          margin: "40px auto",
-          fontFamily: "sans-serif",
-          padding: "0 16px",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fcebeb",
-            border: "1px solid #f0a0a0",
-            borderRadius: "8px",
-            padding: "24px",
-            textAlign: "center",
-            color: "#a32d2d",
-          }}
-        >
-          <p style={{ fontSize: "16px", fontWeight: "500", margin: "0 0 8px" }}>
-            Something went wrong
-          </p>
-          <p style={{ fontSize: "14px", margin: 0 }}>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // =============================================
-  // RENDER 3 — success state
-  // =============================================
-  // no loading, no error
-  // show doctors with search filter
-  // =============================================
   return (
     <div
       style={{
         maxWidth: "500px",
         margin: "40px auto",
-        fontFamily: "sans-serif",
         padding: "0 16px",
       }}
     >
-      {/* HEADER */}
-      <h1 style={{ color: "#1a1a2e", marginBottom: "4px" }}>ZENOVA Clinic</h1>
-      <p style={{ color: "#888", fontSize: "14px", marginBottom: "24px" }}>
-        {doctors.length} doctors loaded from API
-      </p>
+      {/* =============================================
+          PROVIDER — noticeboard
+          =============================================
+          value has two things:
+          1. clinicName — static, never changes
+          2. city — comes from state, can change
 
-      {/* SEARCH INPUT */}
-      {/* connected to searchQuery state */}
-      {/* filters doctors in real time */}
-      <input
-        type="text"
-        placeholder="Search doctor by name..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px 14px",
-          fontSize: "14px",
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          marginBottom: "8px",
-          boxSizing: "border-box",
-          outline: "none",
+          when city state changes
+          Provider value updates
+          all components inside re-render
+          ============================================= */}
+      <ClinicContext.Provider
+        value={{
+          clinicName: "ZENOVA Medical Center",
+          city: city,
+          // city: city means:
+          // left side  = key name in Context
+          // right side = city state value
         }}
-      />
+      >
+        {/* Header reads city from Context */}
+        <Header />
 
-      {/* results count */}
-      <p style={{ color: "#888", fontSize: "13px", marginBottom: "16px" }}>
-        Showing {filteredDoctors.length} doctors
-      </p>
-
-      {/* DOCTOR LIST */}
-      {/* if filteredDoctors has items — show cards */}
-      {/* if empty — show no results message */}
-      {filteredDoctors.length > 0 ? (
-        filteredDoctors.map((doctor) => (
-          <DoctorCard
-            key={doctor.id}
-            name={doctor.name}
-            email={doctor.email}
-            phone={doctor.phone}
-            city={doctor.address.city}
-          />
-        ))
-      ) : (
+        {/* =============================================
+            BUTTONS — change city state
+            =============================================
+            when clicked → setCity updates state
+            → Context value updates
+            → Header and Footer both update
+            notice: buttons are NOT inside Header
+            or Footer — they are in App
+            but Header and Footer still update
+            because they read from Context
+            ============================================= */}
         <div
           style={{
-            textAlign: "center",
-            padding: "40px",
-            color: "#aaa",
-            fontSize: "14px",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            backgroundColor: "white",
+            display: "flex",
+            gap: "10px",
+            marginBottom: "16px",
+            flexWrap: "wrap",
           }}
         >
-          No doctors found for "{searchQuery}"
+          {/* each button sets city to a different value */}
+          <button
+            onClick={() => setCity("Islamabad")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: city === "Islamabad" ? "#1a1a2e" : "white",
+              color: city === "Islamabad" ? "white" : "#1a1a2e",
+              border: "1px solid #1a1a2e",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontFamily: "sans-serif",
+            }}
+          >
+            Islamabad
+          </button>
+
+          <button
+            onClick={() => setCity("Lahore")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: city === "Lahore" ? "#1a1a2e" : "white",
+              color: city === "Lahore" ? "white" : "#1a1a2e",
+              border: "1px solid #1a1a2e",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontFamily: "sans-serif",
+            }}
+          >
+            Lahore
+          </button>
+
+          <button
+            onClick={() => setCity("Karachi")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: city === "Karachi" ? "#1a1a2e" : "white",
+              color: city === "Karachi" ? "white" : "#1a1a2e",
+              border: "1px solid #1a1a2e",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontFamily: "sans-serif",
+            }}
+          >
+            Karachi
+          </button>
         </div>
-      )}
+
+        {/* Footer also reads city from Context */}
+        <Footer />
+      </ClinicContext.Provider>
     </div>
   );
 }
