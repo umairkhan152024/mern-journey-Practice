@@ -1,324 +1,145 @@
 // ============================================
 // FILE: src/App.jsx
-// STAGE 4 — PIECE 4 OF 4 — FINAL
+// STAGE 5 — PIECE 1 OF 5
 // ============================================
-// REAL WORLD USE CASE:
-// Logged in user stored in Context
-// Any component reads it directly
+// GOAL: understand basic routing
+// We have two pages:
+// /        → Home page
+// /doctors → Doctors page
 //
-// FLOW:
-// User clicks Login → user state updates
-// → Context updates
-// → Header shows user name
-// → DoctorCard shows "Book as Umair"
-// → Footer shows user email
-//
-// User clicks Logout → user state = null
-// → Context updates
-// → everything shows "not logged in"
+// When URL is /        → Home component shows
+// When URL is /doctors → Doctors component shows
+// No page refresh — React Router handles it
 // ============================================
 
-import { createContext, useContext, useState } from "react";
-
-// create the noticeboard
-const UserContext = createContext();
+// IMPORT from react-router-dom
+// BrowserRouter → enables routing in the app
+// Routes        → container for all routes
+// Route         → one single route definition
+// Link          → like <a> tag but no page refresh
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 // ============================================
-// COMPONENT: Header
+// PAGE 1 — Home
 // ============================================
-function Header() {
-  // read user and logout function from Context
-  const { user, logout } = useContext(UserContext);
+// this component shows when URL is /
+// it is a normal React component
+// nothing special about it
+// React Router just decides WHEN to show it
+// ============================================
+function Home() {
+  return (
+    <div style={{ fontFamily: "sans-serif", padding: "20px" }}>
+      <h1 style={{ color: "#1a1a2e" }}>Welcome to ZENOVA Clinic</h1>
 
+      <p style={{ color: "#555" }}>Best doctors in Islamabad</p>
+    </div>
+  );
+}
+
+// ============================================
+// PAGE 2 — Doctors
+// ============================================
+// this component shows when URL is /doctors
+// also a normal React component
+// ============================================
+function Doctors() {
+  return (
+    <div style={{ fontFamily: "sans-serif", padding: "20px" }}>
+      <h1 style={{ color: "#1a1a2e" }}>Our Doctors</h1>
+
+      <p style={{ color: "#555" }}>Find the best doctors here</p>
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: Navbar
+// ============================================
+// navigation bar with links to each page
+// Link is like <a> tag but:
+//   → does NOT refresh the page
+//   → just changes the URL
+//   → React Router shows the right component
+// ============================================
+function Navbar() {
   return (
     <div
       style={{
         backgroundColor: "#1a1a2e",
-        color: "white",
-        padding: "16px 20px",
-        borderRadius: "8px",
-        marginBottom: "16px",
-        fontFamily: "sans-serif",
+        padding: "16px 24px",
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <h1 style={{ margin: 0, fontSize: "18px" }}>ZENOVA Clinic</h1>
-
-      {/* =============================================
-          CONDITIONAL RENDERING WITH CONTEXT
-          if user is not null — show name and logout
-          if user is null — show "not logged in"
-          ============================================= */}
-      {user ? (
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          {/* user.name from Context */}
-          <p style={{ margin: 0, color: "#aaa", fontSize: "13px" }}>
-            {user.name}
-          </p>
-
-          {/* logout button — calls logout from Context */}
-          <button
-            onClick={logout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#aaa",
-              border: "1px solid #aaa",
-              borderRadius: "6px",
-              padding: "4px 12px",
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
-        <p style={{ margin: 0, color: "#aaa", fontSize: "13px" }}>
-          Not logged in
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: DoctorCard
-// ============================================
-function DoctorCard({ name, specialty, fee }) {
-  // read user from Context
-  const { user } = useContext(UserContext);
-
-  return (
-    <div
-      style={{
-        backgroundColor: "white",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "16px",
-        marginBottom: "12px",
+        gap: "24px",
         fontFamily: "sans-serif",
       }}
     >
-      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
-        {name}
-      </h2>
-      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-        {specialty}
-      </p>
-      <p style={{ margin: "4px 0", fontSize: "14px", fontWeight: "500" }}>
-        Rs. {fee}
-      </p>
-
-      {/* =============================================
-          if user is logged in — show Book button
-          if not logged in — show Login required
-          ============================================= */}
-      {user ? (
-        <button
-          style={{
-            marginTop: "12px",
-            backgroundColor: "#1a1a2e",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "13px",
-            cursor: "pointer",
-          }}
-        >
-          {/* user.name from Context — no props needed */}
-          Book as {user.name}
-        </button>
-      ) : (
-        <p
-          style={{
-            marginTop: "12px",
-            color: "#a32d2d",
-            fontSize: "13px",
-          }}
-        >
-          Please login to book
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: DoctorList
-// ============================================
-function DoctorList() {
-  const doctors = [
-    { id: 1, name: "Dr. Ahmed Khan", specialty: "Cardiologist", fee: 2000 },
-    { id: 2, name: "Dr. Sara Malik", specialty: "Dentist", fee: 1500 },
-    {
-      id: 3,
-      name: "Dr. Bilal Akhtar",
-      specialty: "Skin Specialist",
-      fee: 1800,
-    },
-  ];
-
-  return (
-    <div>
-      {doctors.map((doctor) => (
-        <DoctorCard
-          key={doctor.id}
-          name={doctor.name}
-          specialty={doctor.specialty}
-          fee={doctor.fee}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: Footer
-// ============================================
-function Footer() {
-  // read user from Context
-  const { user } = useContext(UserContext);
-
-  return (
-    <div
-      style={{
-        marginTop: "16px",
-        padding: "16px",
-        borderTop: "1px solid #ddd",
-        fontFamily: "sans-serif",
-        fontSize: "13px",
-        color: "#888",
-        textAlign: "center",
-      }}
-    >
-      {/* if logged in show email — if not show message */}
-      {user ? (
-        <p style={{ margin: 0 }}>Logged in as {user.email}</p>
-      ) : (
-        <p style={{ margin: 0 }}>Please login to access all features</p>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: LoginForm
-// ============================================
-// shows when user is NOT logged in
-// calls login function from Context
-// ============================================
-function LoginForm() {
-  // read login function from Context
-  const { login } = useContext(UserContext);
-
-  return (
-    <div
-      style={{
-        backgroundColor: "white",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "24px",
-        marginBottom: "16px",
-        fontFamily: "sans-serif",
-        textAlign: "center",
-      }}
-    >
-      <h2 style={{ color: "#1a1a2e", marginBottom: "16px" }}>
-        Login to ZENOVA
-      </h2>
-
-      {/* clicking this calls login from Context */}
-      {/* sets user state in App */}
-      {/* every component updates */}
-      <button
-        onClick={login}
+      {/* Link to="/" → goes to home page */}
+      {/* to is like href in normal <a> tag */}
+      <Link
+        to="/"
         style={{
-          backgroundColor: "#1D9E75",
           color: "white",
-          border: "none",
-          borderRadius: "8px",
-          padding: "12px 28px",
-          fontSize: "14px",
-          cursor: "pointer",
-          fontWeight: "500",
+          textDecoration: "none",
+          fontSize: "15px",
         }}
       >
-        Login as Umair Khan
-      </button>
+        Home
+      </Link>
+
+      {/* Link to="/doctors" → goes to doctors page */}
+      <Link
+        to="/doctors"
+        style={{
+          color: "white",
+          textDecoration: "none",
+          fontSize: "15px",
+        }}
+      >
+        Doctors
+      </Link>
     </div>
   );
 }
 
 // ============================================
-// COMPONENT: App — THE PRINCIPAL
+// COMPONENT: App
 // ============================================
 function App() {
-  // =============================================
-  // USER STATE
-  // =============================================
-  // null = not logged in
-  // object = logged in user data
-  // starts as null — nobody logged in
-  // =============================================
-  const [user, setUser] = useState(null);
-
-  // =============================================
-  // LOGIN FUNCTION
-  // =============================================
-  // sets user state to a user object
-  // Context updates → all components update
-  // =============================================
-  function login() {
-    setUser({
-      name: "Umair Khan",
-      email: "umair@zenova.com",
-      role: "Admin",
-    });
-  }
-
-  // =============================================
-  // LOGOUT FUNCTION
-  // =============================================
-  // sets user state back to null
-  // Context updates → all components update
-  // =============================================
-  function logout() {
-    setUser(null);
-  }
-
   return (
-    <div
-      style={{
-        maxWidth: "500px",
-        margin: "40px auto",
-        padding: "0 16px",
-      }}
-    >
+    // =============================================
+    // BrowserRouter
+    // =============================================
+    // wraps the ENTIRE app
+    // enables React Router for everything inside
+    // without this — routing does not work
+    // always put it at the very top level
+    // =============================================
+    <BrowserRouter>
+      {/* Navbar shows on every page */}
+      {/* it is outside Routes */}
+      {/* so it never disappears */}
+      <Navbar />
+
       {/* =============================================
-          PROVIDER
+          Routes — container for all routes
           =============================================
-          sharing 3 things through Context:
-          1. user       → the logged in user object
-          2. login      → function to log in
-          3. logout     → function to log out
-          
-          any component inside can read all 3
+          React Router looks at the current URL
+          finds the matching Route
+          shows that component
+          hides all other components
           ============================================= */}
-      <UserContext.Provider value={{ user, login, logout }}>
-        {/* Header — shows user name and logout button */}
-        <Header />
+      <Routes>
+        {/* Route 1 */}
+        {/* path="/" means: when URL is localhost:5173/ */}
+        {/* element={<Home />} means: show Home component */}
+        <Route path="/" element={<Home />} />
 
-        {/* show LoginForm if not logged in */}
-        {/* show DoctorList if logged in */}
-        {user ? <DoctorList /> : <LoginForm />}
-
-        {/* Footer — shows user email */}
-        <Footer />
-      </UserContext.Provider>
-    </div>
+        {/* Route 2 */}
+        {/* path="/doctors" means: when URL is localhost:5173/doctors */}
+        {/* element={<Doctors />} means: show Doctors component */}
+        <Route path="/doctors" element={<Doctors />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
