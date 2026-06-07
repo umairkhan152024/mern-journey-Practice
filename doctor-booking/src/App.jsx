@@ -1,14 +1,27 @@
 // ============================================
 // FILE: src/App.jsx
-// STAGE 5 — PIECE 2 OF 5 — FULL VERSION
+// STAGE 5 — PIECE 3 OF 5
 // ============================================
-// 4 pages: Home, Doctors, Booking, About
-// NavLink with isActive styling
-// Active link = white + green underline
-// Inactive link = grey
+// NEW THING: useNavigate
+// ============================================
+// useNavigate gives you a function
+// you call that function with a path
+// React Router sends user to that page
+// automatically — no link clicking needed
+//
+// REAL USE CASE:
+// User submits booking form
+// → navigate("/") sends them to home page
+// automatically after submit
 // ============================================
 
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
 
 // ============================================
 // PAGE 1 — Home
@@ -25,27 +38,130 @@ function Home() {
 }
 
 // ============================================
-// PAGE 2 — Doctors
+// PAGE 2 — Booking
 // ============================================
-function Doctors() {
+// This page has a form
+// When user submits the form
+// useNavigate sends them to home page
+// automatically
+// ============================================
+function Booking() {
+  // =============================================
+  // useNavigate hook
+  // =============================================
+  // useNavigate() returns a function
+  // we store it in navigate variable
+  // when we call navigate("/")
+  // React Router sends user to / (home page)
+  // =============================================
+  const navigate = useNavigate();
+
+  // =============================================
+  // handleSubmit
+  // =============================================
+  // runs when user clicks Book button
+  // after booking is done
+  // navigate("/") sends user to home page
+  // automatically — no link clicking needed
+  // =============================================
+  function handleSubmit(e) {
+    // stop page refresh — always first line
+    e.preventDefault();
+
+    // booking logic would go here
+    // like saving to database
+    // for now we just navigate
+
+    // =============================================
+    // navigate("/")
+    // =============================================
+    // this sends user to home page automatically
+    // like clicking the Home NavLink
+    // but done in code — not by user
+    //
+    // you can navigate to any page:
+    // navigate("/")        → home page
+    // navigate("/doctors") → doctors page
+    // navigate("/about")   → about page
+    // =============================================
+    navigate("/");
+  }
+
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "40px" }}>
-      <h1 style={{ color: "#1a1a2e", marginBottom: "8px" }}>Our Doctors</h1>
-      <p style={{ color: "#555" }}>Find the best doctors here</p>
+    <div
+      style={{ fontFamily: "sans-serif", padding: "40px", maxWidth: "400px" }}
+    >
+      <h1 style={{ color: "#1a1a2e", marginBottom: "24px" }}>
+        Book Appointment
+      </h1>
+
+      <form onSubmit={handleSubmit}>
+        {/* name input */}
+        <input
+          type="text"
+          placeholder="Your name"
+          required
+          style={{
+            width: "100%",
+            padding: "10px 14px",
+            fontSize: "14px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            marginBottom: "12px",
+            boxSizing: "border-box",
+            outline: "none",
+          }}
+        />
+
+        {/* phone input */}
+        <input
+          type="tel"
+          placeholder="Your phone"
+          required
+          style={{
+            width: "100%",
+            padding: "10px 14px",
+            fontSize: "14px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            boxSizing: "border-box",
+            outline: "none",
+          }}
+        />
+
+        {/* submit button */}
+        {/* clicking this runs handleSubmit */}
+        {/* handleSubmit calls navigate("/") */}
+        {/* user goes to home page automatically */}
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            backgroundColor: "#1a1a2e",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "12px",
+            fontSize: "15px",
+            fontWeight: "500",
+            cursor: "pointer",
+          }}
+        >
+          Book Appointment
+        </button>
+      </form>
     </div>
   );
 }
 
 // ============================================
-// PAGE 3 — Booking
+// PAGE 3 — Doctors
 // ============================================
-function Booking() {
+function Doctors() {
   return (
     <div style={{ fontFamily: "sans-serif", padding: "40px" }}>
-      <h1 style={{ color: "#1a1a2e", marginBottom: "8px" }}>
-        Book Appointment
-      </h1>
-      <p style={{ color: "#555" }}>Fill in the form to book your appointment</p>
+      <h1 style={{ color: "#1a1a2e" }}>Our Doctors</h1>
     </div>
   );
 }
@@ -56,19 +172,13 @@ function Booking() {
 function About() {
   return (
     <div style={{ fontFamily: "sans-serif", padding: "40px" }}>
-      <h1 style={{ color: "#1a1a2e", marginBottom: "8px" }}>About ZENOVA</h1>
-      <p style={{ color: "#555" }}>We are the best clinic in Islamabad</p>
+      <h1 style={{ color: "#1a1a2e" }}>About ZENOVA</h1>
     </div>
   );
 }
 
 // ============================================
 // COMPONENT: Navbar
-// ============================================
-// NavLink automatically knows active page
-// style function receives { isActive }
-// isActive true  → white + green underline
-// isActive false → grey
 // ============================================
 function Navbar() {
   return (
@@ -82,7 +192,6 @@ function Navbar() {
         alignItems: "center",
       }}
     >
-      {/* Clinic name */}
       <span
         style={{
           color: "white",
@@ -94,22 +203,15 @@ function Navbar() {
         ZENOVA
       </span>
 
-      {/* =============================================
-          NavLink — style receives { isActive }
-          automatically from React Router
-          isActive true  → current page
-          isActive false → not current page
-          ============================================= */}
       <NavLink
         to="/"
         style={({ isActive }) => ({
           color: isActive ? "white" : "#aaaaaa",
+          textDecoration: "none",
+          fontSize: "15px",
           borderBottom: isActive
             ? "2px solid #1D9E75"
             : "2px solid transparent",
-          textDecoration: "none",
-          fontSize: "15px",
-          fontWeight: isActive ? "500" : "400",
           paddingBottom: "4px",
         })}
       >
@@ -120,12 +222,11 @@ function Navbar() {
         to="/doctors"
         style={({ isActive }) => ({
           color: isActive ? "white" : "#aaaaaa",
+          textDecoration: "none",
+          fontSize: "15px",
           borderBottom: isActive
             ? "2px solid #1D9E75"
             : "2px solid transparent",
-          textDecoration: "none",
-          fontSize: "15px",
-          fontWeight: isActive ? "500" : "400",
           paddingBottom: "4px",
         })}
       >
@@ -136,12 +237,11 @@ function Navbar() {
         to="/booking"
         style={({ isActive }) => ({
           color: isActive ? "white" : "#aaaaaa",
+          textDecoration: "none",
+          fontSize: "15px",
           borderBottom: isActive
             ? "2px solid #1D9E75"
             : "2px solid transparent",
-          textDecoration: "none",
-          fontSize: "15px",
-          fontWeight: isActive ? "500" : "400",
           paddingBottom: "4px",
         })}
       >
@@ -152,12 +252,11 @@ function Navbar() {
         to="/about"
         style={({ isActive }) => ({
           color: isActive ? "white" : "#aaaaaa",
+          textDecoration: "none",
+          fontSize: "15px",
           borderBottom: isActive
             ? "2px solid #1D9E75"
             : "2px solid transparent",
-          textDecoration: "none",
-          fontSize: "15px",
-          fontWeight: isActive ? "500" : "400",
           paddingBottom: "4px",
         })}
       >
@@ -173,9 +272,7 @@ function Navbar() {
 function App() {
   return (
     <BrowserRouter>
-      {/* Navbar always visible on every page */}
       <Navbar />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/doctors" element={<Doctors />} />
