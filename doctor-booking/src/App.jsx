@@ -1,67 +1,26 @@
 // ============================================
 // FILE: src/App.jsx
-// STAGE 5 — PIECE 1 OF 5
-// ============================================
-// GOAL: understand basic routing
-// We have two pages:
-// /        → Home page
-// /doctors → Doctors page
-//
-// When URL is /        → Home component shows
-// When URL is /doctors → Doctors component shows
-// No page refresh — React Router handles it
+// GOAL: understand isActive clearly
 // ============================================
 
-// IMPORT from react-router-dom
-// BrowserRouter → enables routing in the app
-// Routes        → container for all routes
-// Route         → one single route definition
-// Link          → like <a> tag but no page refresh
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 
-// ============================================
-// PAGE 1 — Home
-// ============================================
-// this component shows when URL is /
-// it is a normal React component
-// nothing special about it
-// React Router just decides WHEN to show it
-// ============================================
 function Home() {
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "20px" }}>
-      <h1 style={{ color: "#1a1a2e" }}>Welcome to ZENOVA Clinic</h1>
-
-      <p style={{ color: "#555" }}>Best doctors in Islamabad</p>
+    <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
+      <h1>Home Page</h1>
     </div>
   );
 }
 
-// ============================================
-// PAGE 2 — Doctors
-// ============================================
-// this component shows when URL is /doctors
-// also a normal React component
-// ============================================
 function Doctors() {
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "20px" }}>
-      <h1 style={{ color: "#1a1a2e" }}>Our Doctors</h1>
-
-      <p style={{ color: "#555" }}>Find the best doctors here</p>
+    <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
+      <h1>Doctors Page</h1>
     </div>
   );
 }
 
-// ============================================
-// COMPONENT: Navbar
-// ============================================
-// navigation bar with links to each page
-// Link is like <a> tag but:
-//   → does NOT refresh the page
-//   → just changes the URL
-//   → React Router shows the right component
-// ============================================
 function Navbar() {
   return (
     <div
@@ -73,70 +32,59 @@ function Navbar() {
         fontFamily: "sans-serif",
       }}
     >
-      {/* Link to="/" → goes to home page */}
-      {/* to is like href in normal <a> tag */}
-      <Link
+      {/* =============================================
+          NavLink style prop takes a FUNCTION
+          NavLink calls this function automatically
+          and passes { isActive } to it
+          
+          { isActive } is an object with one property
+          isActive = true  → this link is current page
+          isActive = false → this link is not current page
+          
+          we return a style object based on isActive
+          ============================================= */}
+      <NavLink
         to="/"
-        style={{
-          color: "white",
+        style={({ isActive }) => ({
+          // if isActive is true  → color is white
+          // if isActive is false → color is grey
+          color: isActive ? "white" : "#aaaaaa",
+
+          // if isActive is true  → green underline
+          // if isActive is false → no underline
+          borderBottom: isActive ? "2px solid #1D9E75" : "none",
+
+          // remove default underline from link
           textDecoration: "none",
           fontSize: "15px",
-        }}
+          paddingBottom: "4px",
+        })}
       >
         Home
-      </Link>
+      </NavLink>
 
-      {/* Link to="/doctors" → goes to doctors page */}
-      <Link
+      <NavLink
         to="/doctors"
-        style={{
-          color: "white",
+        style={({ isActive }) => ({
+          color: isActive ? "white" : "#aaaaaa",
+          borderBottom: isActive ? "2px solid #1D9E75" : "none",
           textDecoration: "none",
           fontSize: "15px",
-        }}
+          paddingBottom: "4px",
+        })}
       >
         Doctors
-      </Link>
+      </NavLink>
     </div>
   );
 }
 
-// ============================================
-// COMPONENT: App
-// ============================================
 function App() {
   return (
-    // =============================================
-    // BrowserRouter
-    // =============================================
-    // wraps the ENTIRE app
-    // enables React Router for everything inside
-    // without this — routing does not work
-    // always put it at the very top level
-    // =============================================
     <BrowserRouter>
-      {/* Navbar shows on every page */}
-      {/* it is outside Routes */}
-      {/* so it never disappears */}
       <Navbar />
-
-      {/* =============================================
-          Routes — container for all routes
-          =============================================
-          React Router looks at the current URL
-          finds the matching Route
-          shows that component
-          hides all other components
-          ============================================= */}
       <Routes>
-        {/* Route 1 */}
-        {/* path="/" means: when URL is localhost:5173/ */}
-        {/* element={<Home />} means: show Home component */}
         <Route path="/" element={<Home />} />
-
-        {/* Route 2 */}
-        {/* path="/doctors" means: when URL is localhost:5173/doctors */}
-        {/* element={<Doctors />} means: show Doctors component */}
         <Route path="/doctors" element={<Doctors />} />
       </Routes>
     </BrowserRouter>
