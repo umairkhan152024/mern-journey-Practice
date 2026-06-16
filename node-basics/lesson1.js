@@ -1,4 +1,7 @@
-const { add, subtract } = require("./math");
-
-console.log("5 + 3 =", add(5, 3));
-console.log("5 - 3 =", subtract(5, 3));
+console.log("1. First task - nodemon is watching!");
+setTimeout(() => {
+  console.log(
+    "2. After 5 seconds, nodemon will restart the server and run this code again.",
+  );
+}, 5000);
+console.log("3. First task - nodemon is watching!");
