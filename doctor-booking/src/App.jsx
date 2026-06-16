@@ -1,190 +1,326 @@
 // ============================================
-// FILE: src/App.jsx
+// EXAMPLE 5 — useState with an object
+// CONCEPT: storing multiple values in one state
 // ============================================
-// This is where we USE Redux
+// object holds multiple related values together
+// {} = empty object
 //
-// useSelector → open the fridge and LOOK
-// useDispatch → write a note to the fridge
+// REAL USE CASE:
+// form data — name, phone, doctor, date
+// user profile — name, email, role
+// doctor info — name, specialty, fee, city
+//
+// KEY RULE:
+// when updating ONE field
+// keep all other fields with spread operator
+// {...formData, name: "new value"}
 // ============================================
 
-// useSelector → READ from store
-// useDispatch → CHANGE the store
-import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
 
-// import the actions (notes) from favoritesSlice
-import { addFavorite, removeFavorite } from "./favoritesSlice";
-
-// doctors data — hardcoded for now
-const doctors = [
-  { id: 1, name: "Dr. Ahmed Khan", specialty: "Cardiologist" },
-  { id: 2, name: "Dr. Sara Malik", specialty: "Dentist" },
-  { id: 3, name: "Dr. Bilal Akhtar", specialty: "Skin Specialist" },
-];
-
-// ============================================
-// COMPONENT: DoctorCard
-// ============================================
-function DoctorCard({ doctor }) {
-  // =============================================
-  // useSelector — READ from store
-  // =============================================
-  // open the fridge
-  // look at the favorites shelf
-  // get the items array
-  // =============================================
-  const favorites = useSelector((state) => state.favorites.items);
-
-  // =============================================
-  // useDispatch — get dispatch function
-  // =============================================
-  // dispatch is how we write notes
-  // and send them to the store
-  // =============================================
-  const dispatch = useDispatch();
-
-  // =============================================
-  // isFavorite
-  // =============================================
-  // check if THIS doctor is already in favorites
-  // .some() returns true if any item matches
-  // =============================================
-  const isFavorite = favorites.some((item) => item.id === doctor.id);
-
-  return (
-    <div
-      style={{
-        backgroundColor: "white",
-        border: isFavorite ? "2px solid #1D9E75" : "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "16px",
-        marginBottom: "12px",
-        fontFamily: "sans-serif",
-      }}
-    >
-      {/* doctor name */}
-      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
-        {doctor.name}
-      </h2>
-
-      {/* specialty */}
-      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-        {doctor.specialty}
-      </p>
-
-      {/* =============================================
-          ADD / REMOVE FAVORITE BUTTON
-          =============================================
-          if already favorite → show Remove button
-          if not favorite     → show Add button
-
-          clicking Add:
-          dispatch(addFavorite(doctor))
-          → sends note to fridge
-          → "please add this doctor to favorites"
-          → reducer runs
-          → items array updated
-          → useSelector sees change
-          → component re-renders
-
-          clicking Remove:
-          dispatch(removeFavorite(doctor.id))
-          → sends note to fridge
-          → "please remove doctor with this id"
-          → reducer filters it out
-          ============================================= */}
-      {isFavorite ? (
-        // already favorite — show remove button
-        <button
-          onClick={() => dispatch(removeFavorite(doctor.id))}
-          style={{
-            marginTop: "10px",
-            backgroundColor: "#fcebeb",
-            color: "#a32d2d",
-            border: "none",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "13px",
-            cursor: "pointer",
-          }}
-        >
-          ♥ Remove Favorite
-        </button>
-      ) : (
-        // not favorite — show add button
-        <button
-          onClick={() => dispatch(addFavorite(doctor))}
-          style={{
-            marginTop: "10px",
-            backgroundColor: "#e1f5ee",
-            color: "#0f6e56",
-            border: "none",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "13px",
-            cursor: "pointer",
-          }}
-        >
-          ♡ Add Favorite
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: FavoritesCount
-// ============================================
-// shows how many favorites in the store
-// reads from Redux store using useSelector
-// ============================================
-function FavoritesCount() {
-  // read favorites from store
-  const favorites = useSelector((state) => state.favorites.items);
-
-  return (
-    <div
-      style={{
-        backgroundColor: "#1a1a2e",
-        color: "white",
-        padding: "16px 24px",
-        borderRadius: "8px",
-        marginBottom: "24px",
-        fontFamily: "sans-serif",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <h1 style={{ margin: 0, fontSize: "18px" }}>ZENOVA Clinic</h1>
-
-      {/* favorites count from Redux store */}
-      <p style={{ margin: 0, fontSize: "14px", color: "#aaa" }}>
-        ♥ {favorites.length} favorites
-      </p>
-    </div>
-  );
-}
-
-// ============================================
-// COMPONENT: App
-// ============================================
 function App() {
+
+  // =============================================
+  // useState with object
+  // =============================================
+  // formData holds ALL form fields in ONE state
+  // instead of separate useState for each field
+  //
+  // formData.name    → patient name
+  // formData.phone   → phone number
+  // formData.doctor  → selected doctor
+  // =============================================
+  const [formData, setFormData] = useState({
+    name: "",      // empty at start
+    phone: "",     // empty at start
+    doctor: "",    // empty at start
+  });
+
+  // tracks if form was submitted
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+
+  // =============================================
+  // handleChange — ONE function for ALL inputs
+  // =============================================
+  // e.target.name  → which field changed
+  //                  matches name="" on input
+  // e.target.value → what user typed
+  //
+  // ...formData    → keep ALL existing values
+  // [e.target.name]: e.target.value
+  //                → update ONLY changed field
+  //
+  // EXAMPLE:
+  // user types "Umair" in name field
+  // e.target.name  = "name"
+  // e.target.value = "Umair"
+  // result: { name: "Umair", phone: "", doctor: "" }
+  // =============================================
+  function handleChange(e) {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+
+  // =============================================
+  // handleSubmit
+  // =============================================
+  // stops page refresh
+  // sets isSubmitted to true
+  // shows success screen
+  // =============================================
+  function handleSubmit(e) {
+    e.preventDefault();
+    setIsSubmitted(true);
+  }
+
+
+  // =============================================
+  // handleReset
+  // =============================================
+  // clears all fields back to empty
+  // sets isSubmitted back to false
+  // shows form again
+  // =============================================
+  function handleReset() {
+    setFormData({
+      name: "",
+      phone: "",
+      doctor: "",
+    });
+    setIsSubmitted(false);
+  }
+
+
+  // SUCCESS SCREEN
+  if (isSubmitted) {
+    return (
+      <div
+        style={{
+          maxWidth: "400px",
+          margin: "40px auto",
+          fontFamily: "sans-serif",
+          padding: "0 16px",
+          textAlign: "center",
+        }}
+      >
+
+        {/* green circle */}
+        <div
+          style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            backgroundColor: "#e1f5ee",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 16px",
+            fontSize: "28px",
+            color: "#0f6e56",
+          }}
+        >
+          ✓
+        </div>
+
+        <h2 style={{ color: "#0f6e56", marginBottom: "16px" }}>
+          Appointment Booked!
+        </h2>
+
+        {/* show submitted data from formData state */}
+        {/* formData still holds values after submit */}
+        {/* because we never cleared it */}
+        <p style={{ color: "#555", margin: "6px 0" }}>
+          Name: {formData.name}
+        </p>
+        <p style={{ color: "#555", margin: "6px 0" }}>
+          Phone: {formData.phone}
+        </p>
+        <p style={{ color: "#555", margin: "6px 0" }}>
+          Doctor: {formData.doctor}
+        </p>
+
+        <button
+          onClick={handleReset}
+          style={{
+            marginTop: "24px",
+            backgroundColor: "#1a1a2e",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "12px 28px",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
+        >
+          Book Another
+        </button>
+
+      </div>
+    );
+  }
+
+
+  // MAIN FORM
   return (
     <div
       style={{
-        maxWidth: "500px",
+        maxWidth: "400px",
         margin: "40px auto",
+        fontFamily: "sans-serif",
         padding: "0 16px",
       }}
     >
-      {/* FavoritesCount reads from Redux */}
-      {/* updates automatically when favorites change */}
-      <FavoritesCount />
 
-      {/* render all doctor cards */}
-      {doctors.map((doctor) => (
-        <DoctorCard key={doctor.id} doctor={doctor} />
-      ))}
+      <h1 style={{ color: "#1a1a2e", marginBottom: "24px" }}>
+        Book Appointment
+      </h1>
+
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          backgroundColor: "white",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "24px",
+        }}
+      >
+
+        {/* NAME INPUT */}
+        {/* name="name" → matches formData.name key */}
+        <div style={{ marginBottom: "14px" }}>
+          <label
+            htmlFor="name"
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#333",
+            }}
+          >
+            Patient Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            required
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              fontSize: "14px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxSizing: "border-box",
+              outline: "none",
+            }}
+          />
+        </div>
+
+
+        {/* PHONE INPUT */}
+        {/* name="phone" → matches formData.phone key */}
+        <div style={{ marginBottom: "14px" }}>
+          <label
+            htmlFor="phone"
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#333",
+            }}
+          >
+            Phone Number
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="03XX-XXXXXXX"
+            required
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              fontSize: "14px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxSizing: "border-box",
+              outline: "none",
+            }}
+          />
+        </div>
+
+
+        {/* DOCTOR SELECT */}
+        {/* name="doctor" → matches formData.doctor key */}
+        <div style={{ marginBottom: "24px" }}>
+          <label
+            htmlFor="doctor"
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#333",
+            }}
+          >
+            Select Doctor
+          </label>
+          <select
+            id="doctor"
+            name="doctor"
+            value={formData.doctor}
+            onChange={handleChange}
+            required
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              fontSize: "14px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxSizing: "border-box",
+              outline: "none",
+              backgroundColor: "white",
+            }}
+          >
+            <option value="">-- Select a doctor --</option>
+            <option value="Dr. Ahmed Khan">Dr. Ahmed Khan</option>
+            <option value="Dr. Sara Malik">Dr. Sara Malik</option>
+            <option value="Dr. Bilal Akhtar">Dr. Bilal Akhtar</option>
+          </select>
+        </div>
+
+
+        {/* SUBMIT BUTTON */}
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            backgroundColor: "#1a1a2e",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "12px",
+            fontSize: "15px",
+            fontWeight: "500",
+            cursor: "pointer",
+          }}
+        >
+          Book Appointment
+        </button>
+
+      </form>
+
     </div>
   );
 }

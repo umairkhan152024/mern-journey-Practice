@@ -1,35 +1,56 @@
 // ============================================
 // FILE: src/main.jsx
 // ============================================
-// This file wraps the whole app
-// with Provider so every component
-// can access the Redux store (fridge)
+// We now have TWO providers:
+// 1. QueryClientProvider → for React Query
+// 2. Provider            → for Redux
+//
+// Both wrap the whole app
 // ============================================
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 
-// Provider — opens the fridge to everyone
+// Redux Provider and store
 import { Provider } from "react-redux";
-
-// our store (fridge) from store.js
 import { store } from "./store.js";
+
+// React Query
+// QueryClient     → the brain of React Query
+//                   manages all fetching and caching
+// QueryClientProvider → gives every component
+//                       access to React Query
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// =============================================
+// CREATE QueryClient
+// =============================================
+// QueryClient is the brain
+// it manages:
+// → all your queries
+// → caching
+// → retries
+// → background updates
+//
+// create it OUTSIDE the component
+// so it is created only once
+// =============================================
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {/* =============================================
-        Provider wraps the WHOLE app
-        =============================================
-        store={store} — every component inside
-        can now READ and CHANGE Redux state
-
-        same idea as Context.Provider
-        but for the WHOLE app
-        ONE provider for ALL data
+        QueryClientProvider — React Query brain
+        wraps the whole app
+        client={queryClient} — gives access to
+        all React Query features
         ============================================= */}
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      {/* Redux Provider — same as before */}
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </QueryClientProvider>
   </StrictMode>,
 );
