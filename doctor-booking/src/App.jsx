@@ -1,76 +1,90 @@
-// ============================================
-// EXAMPLE 4 — onKeyDown
-// CONCEPT: detecting specific key presses
-// ============================================
-// onKeyDown fires when user presses ANY key
-// e.key tells us WHICH key was pressed
-//
-// Common keys:
-// e.key === "Enter"   → Enter key
-// e.key === "Escape"  → Escape key
-// e.key === "Backspace" → Backspace key
-// e.key === "a"       → letter a
-// e.key === " "       → spacebar
-//
-// REAL USE CASE:
-// press Enter to search
-// press Escape to close a modal
-// press arrow keys to navigate
-// ============================================
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useParams,
+} from "react-router-dom";
 
-import { useState } from "react";
+const doctors = [
+  { id: 1, name: "Dr. Ahmed Khan", specialty: "Cardiologist", fee: 2000 },
+  { id: 2, name: "Dr. Sara Malik", specialty: "Dentist", fee: 1500 },
+  { id: 3, name: "Dr. Bilal Akhtar", specialty: "Skin Specialist", fee: 1800 },
+];
 
-function App() {
-  const [search, setSearch] = useState("");
-  const [results, setResults] = useState([]);
-  const [message, setMessage] = useState("");
+function DoctorList() {
+  return (
+    <div
+      style={{
+        maxWidth: "400px",
+        margin: "40px auto",
+        fontFamily: "sans-serif",
+        padding: "0 16px",
+      }}
+    >
+      <h1 style={{ color: "#1a1a2e", marginBottom: "24px" }}>Our Doctors</h1>
+      {doctors.map((doctor) => (
+        <div
+          key={doctor.id}
+          style={{
+            backgroundColor: "white",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "16px",
+            marginBottom: "12px",
+          }}
+        >
+          <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
+            {doctor.name}
+          </h2>
+          <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+            {doctor.specialty}
+          </p>
+          <Link
+            to={`/doctors/${doctor.id}`}
+            style={{
+              display: "inline-block",
+              marginTop: "10px",
+              padding: "6px 16px",
+              backgroundColor: "#1a1a2e",
+              color: "white",
+              borderRadius: "6px",
+              textDecoration: "none",
+              fontSize: "13px",
+            }}
+          >
+            View Profile
+          </Link>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  // doctors list to search through
-  const doctors = [
-    "Dr. Ahmed Khan",
-    "Dr. Sara Malik",
-    "Dr. Bilal Akhtar",
-    "Dr. Fatima Noor",
-    "Dr. Usman Ali",
-  ];
+function DoctorProfile() {
+  const { id } = useParams();
 
-  // =============================================
-  // handleKeyDown
-  // =============================================
-  // fires on every key press
-  // e.key tells us which key
-  //
-  // Enter  → run the search
-  // Escape → clear everything
-  // =============================================
-  function handleKeyDown(e) {
-    // =============================================
-    // Enter key pressed
-    // =============================================
-    // filter doctors that match search text
-    // show results
-    // =============================================
-    if (e.key === "Enter") {
-      setMessage("Enter pressed — searching...");
+  // Number(id) converts "1" string to 1 number
+  // because doctor.id is number but URL param is string
+  // 1 === "1" is false — so we must convert
+  const doctor = doctors.find((d) => d.id === Number(id));
 
-      // filter doctors by search text
-      const filtered = doctors.filter((doctor) =>
-        doctor.toLowerCase().includes(search.toLowerCase()),
-      );
-
-      setResults(filtered);
-    }
-
-    // =============================================
-    // Escape key pressed
-    // =============================================
-    // clear search and results
-    // =============================================
-    if (e.key === "Escape") {
-      setMessage("Escape pressed — cleared!");
-      setSearch("");
-      setResults([]);
-    }
+  if (!doctor) {
+    return (
+      <div
+        style={{
+          maxWidth: "400px",
+          margin: "40px auto",
+          fontFamily: "sans-serif",
+          padding: "0 16px",
+        }}
+      >
+        <h2 style={{ color: "#a32d2d" }}>Doctor not found</h2>
+        <Link to="/doctors" style={{ color: "#1a1a2e" }}>
+          ← Back to doctors
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -82,85 +96,41 @@ function App() {
         padding: "0 16px",
       }}
     >
-      <h1 style={{ color: "#1a1a2e", marginBottom: "8px" }}>
-        onKeyDown Example
-      </h1>
-
-      <p style={{ color: "#888", fontSize: "13px", marginBottom: "24px" }}>
-        Type a name → press Enter to search → press Escape to clear
-      </p>
-
-      {/* =============================================
-          INPUT with onKeyDown
-          =============================================
-          onChange → updates search state on every keystroke
-          onKeyDown → checks which key was pressed
-                      Enter  → search
-                      Escape → clear
-          ============================================= */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Type doctor name and press Enter..."
+      <Link
+        to="/doctors"
+        style={{ color: "#555", textDecoration: "none", fontSize: "14px" }}
+      >
+        ← Back
+      </Link>
+      <div
         style={{
-          width: "100%",
-          padding: "10px 14px",
-          fontSize: "14px",
+          backgroundColor: "white",
           border: "1px solid #ddd",
           borderRadius: "8px",
-          boxSizing: "border-box",
-          outline: "none",
-          marginBottom: "12px",
+          padding: "24px",
+          marginTop: "16px",
         }}
-      />
-
-      {/* show which key was pressed */}
-      {message && (
-        <p
-          style={{
-            color: "#378ADD",
-            fontSize: "13px",
-            marginBottom: "12px",
-          }}
-        >
-          {message}
+      >
+        <h1 style={{ margin: "0 0 8px", color: "#1a1a2e" }}>{doctor.name}</h1>
+        <p style={{ margin: "6px 0", color: "#555", fontSize: "15px" }}>
+          Specialty: {doctor.specialty}
         </p>
-      )}
-
-      {/* RESULTS */}
-      {results.length > 0 ? (
-        <div>
-          <p style={{ color: "#888", fontSize: "13px", marginBottom: "8px" }}>
-            {results.length} doctor(s) found:
-          </p>
-
-          {results.map((doctor, index) => (
-            <div
-              key={index}
-              style={{
-                backgroundColor: "white",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "12px 16px",
-                marginBottom: "8px",
-              }}
-            >
-              <p style={{ margin: 0, color: "#1a1a2e", fontSize: "14px" }}>
-                {doctor}
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        search && (
-          <p style={{ color: "#aaa", fontSize: "14px" }}>
-            Press Enter to search for "{search}"
-          </p>
-        )
-      )}
+        <p style={{ margin: "6px 0", fontSize: "15px", fontWeight: "500" }}>
+          Fee: Rs. {doctor.fee}
+        </p>
+      </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/doctors" element={<DoctorList />} />
+        <Route path="/doctors/:id" element={<DoctorProfile />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
