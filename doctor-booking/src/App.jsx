@@ -1,163 +1,200 @@
 // ============================================
 // FILE: src/App.jsx
-// useMutation — simple example
+// COMBINING Redux + React Query
 // ============================================
-// useQuery   → runs automatically (GET doctors)
-// useMutation → waits for button click (POST appointment)
+// React Query → fetches doctors (server data)
+// Redux       → tracks favorites (app data)
+//
+// DoctorCard uses BOTH at the same time
 // ============================================
 
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSelector, useDispatch } from "react-redux";
+import { addFavorite, removeFavorite } from "./favoritesSlice";
 
 // =============================================
-// fetch function for useQuery
+// fetch function for React Query
 // =============================================
 async function fetchDoctors() {
   const response = await fetch("https://jsonplaceholder.typicode.com/users");
+  if (!response.ok) {
+    throw new Error("Could not fetch doctors");
+  }
   return response.json();
 }
 
-// =============================================
-// post function for useMutation
-// =============================================
-async function bookAppointment(appointmentData) {
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(appointmentData),
-  });
-  return response.json();
+// ============================================
+// COMPONENT: DoctorCard
+// ============================================
+// uses Redux for favorites logic
+// receives doctor data as props (from React Query)
+// ============================================
+function DoctorCard({ doctor }) {
+  // REDUX — read favorites
+  const favorites = useSelector((state) => state.favorites.items);
+  const dispatch = useDispatch();
+
+  const isFavorite = favorites.some((item) => item.id === doctor.id);
+
+  return (
+    <div
+      style={{
+        backgroundColor: "white",
+        border: isFavorite ? "2px solid #1D9E75" : "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "16px",
+        marginBottom: "12px",
+        fontFamily: "sans-serif",
+      }}
+    >
+      <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
+        {doctor.name}
+      </h2>
+      <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
+        {doctor.email}
+      </p>
+
+      {isFavorite ? (
+        <button
+          onClick={() => dispatch(removeFavorite(doctor.id))}
+          style={{
+            marginTop: "10px",
+            backgroundColor: "#fcebeb",
+            color: "#a32d2d",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            fontSize: "13px",
+            cursor: "pointer",
+          }}
+        >
+          ♥ Remove Favorite
+        </button>
+      ) : (
+        <button
+          onClick={() => dispatch(addFavorite(doctor))}
+          style={{
+            marginTop: "10px",
+            backgroundColor: "#e1f5ee",
+            color: "#0f6e56",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            fontSize: "13px",
+            cursor: "pointer",
+          }}
+        >
+          ♡ Add Favorite
+        </button>
+      )}
+    </div>
+  );
 }
 
+// ============================================
+// COMPONENT: FavoritesCount
+// ============================================
+// pure Redux — no React Query here
+// ============================================
+function FavoritesCount() {
+  const favorites = useSelector((state) => state.favorites.items);
+
+  return (
+    <div
+      style={{
+        backgroundColor: "#1a1a2e",
+        color: "white",
+        padding: "16px 24px",
+        borderRadius: "8px",
+        marginBottom: "24px",
+        fontFamily: "sans-serif",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <h1 style={{ margin: 0, fontSize: "18px" }}>ZENOVA Clinic</h1>
+      <p style={{ margin: 0, fontSize: "14px", color: "#aaa" }}>
+        ♥ {favorites.length} favorites
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// COMPONENT: App
+// ============================================
 function App() {
-  const [name, setName] = useState("");
-
   // =============================================
-  // useQuery — RUNS AUTOMATICALLY
+  // REACT QUERY — fetch doctors from server
   // =============================================
-  // the moment App component loads
-  // fetchDoctors runs by itself
-  // we don't click anything
-  // =============================================
-  const { data: doctors, isLoading } = useQuery({
+  const {
+    data: doctors,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctors,
   });
 
-  // =============================================
-  // useMutation — WAITS for trigger
-  // =============================================
-  // bookAppointment does NOT run yet
-  // it waits until we call mutation.mutate()
-  // =============================================
-  const mutation = useMutation({
-    mutationFn: bookAppointment,
-  });
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          maxWidth: "500px",
+          margin: "40px auto",
+          textAlign: "center",
+          fontFamily: "sans-serif",
+          color: "#888",
+        }}
+      >
+        <p style={{ fontSize: "18px" }}>Loading doctors...</p>
+      </div>
+    );
+  }
 
-  function handleBook() {
-    // =============================================
-    // THIS is what TRIGGERS the mutation
-    // =============================================
-    // mutation.mutate(data)
-    // → NOW bookAppointment actually runs
-    // =============================================
-    mutation.mutate({ patientName: name });
+  if (error) {
+    return (
+      <div
+        style={{
+          maxWidth: "500px",
+          margin: "40px auto",
+          fontFamily: "sans-serif",
+          padding: "0 16px",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#fcebeb",
+            border: "1px solid #f0a0a0",
+            borderRadius: "8px",
+            padding: "24px",
+            textAlign: "center",
+            color: "#a32d2d",
+          }}
+        >
+          {error.message}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div
       style={{
-        maxWidth: "400px",
+        maxWidth: "500px",
         margin: "40px auto",
-        fontFamily: "sans-serif",
         padding: "0 16px",
       }}
     >
-      <h1 style={{ color: "#1a1a2e", marginBottom: "16px" }}>
-        useQuery vs useMutation
-      </h1>
+      {/* REDUX component */}
+      <FavoritesCount />
 
-      {/* =============================================
-          useQuery part — runs automatically
-          ============================================= */}
-      <div
-        style={{
-          backgroundColor: "#e6f1fb",
-          border: "1px solid #b5d4f4",
-          borderRadius: "8px",
-          padding: "16px",
-          marginBottom: "24px",
-        }}
-      >
-        <p style={{ margin: "0 0 8px", fontWeight: "500", color: "#185fa5" }}>
-          useQuery (automatic)
-        </p>
-        {isLoading ? (
-          <p style={{ margin: 0, fontSize: "14px", color: "#185fa5" }}>
-            Loading doctors...
-          </p>
-        ) : (
-          <p style={{ margin: 0, fontSize: "14px", color: "#185fa5" }}>
-            {doctors.length} doctors loaded automatically
-          </p>
-        )}
-      </div>
-
-      {/* =============================================
-          useMutation part — waits for click
-          ============================================= */}
-      <div
-        style={{
-          backgroundColor: "#fbeaf0",
-          border: "1px solid #f4c0d1",
-          borderRadius: "8px",
-          padding: "16px",
-        }}
-      >
-        <p style={{ margin: "0 0 8px", fontWeight: "500", color: "#993556" }}>
-          useMutation (waits for click)
-        </p>
-
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          style={{
-            width: "100%",
-            padding: "8px 12px",
-            fontSize: "13px",
-            border: "1px solid #ddd",
-            borderRadius: "6px",
-            marginBottom: "10px",
-            boxSizing: "border-box",
-          }}
-        />
-
-        {/* clicking THIS triggers the mutation */}
-        <button
-          onClick={handleBook}
-          disabled={mutation.isPending}
-          style={{
-            width: "100%",
-            backgroundColor: "#993556",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            padding: "10px",
-            fontSize: "13px",
-            cursor: "pointer",
-          }}
-        >
-          {mutation.isPending ? "Booking..." : "Click to trigger mutation"}
-        </button>
-
-        {mutation.isSuccess && (
-          <p style={{ margin: "10px 0 0", fontSize: "13px", color: "#0f6e56" }}>
-            ✓ Mutation triggered successfully!
-          </p>
-        )}
-      </div>
+      {/* React Query data, mapped through DoctorCard */}
+      {/* each DoctorCard uses Redux internally */}
+      {doctors.map((doctor) => (
+        <DoctorCard key={doctor.id} doctor={doctor} />
+      ))}
     </div>
   );
 }
