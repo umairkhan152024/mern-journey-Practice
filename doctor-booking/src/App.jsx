@@ -1,141 +1,163 @@
 // ============================================
 // FILE: src/App.jsx
-// REACT QUERY — useQuery
+// useMutation — simple example
 // ============================================
-// COMPARE:
-//
-// OLD WAY (useEffect):
-//   const [doctors, setDoctors] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   useEffect(() => { fetch... }, []);
-//   → 10+ lines of code
-//
-// NEW WAY (React Query):
-//   const { data, isLoading, error } = useQuery({...});
-//   → 4 lines of code
-//   → PLUS automatic caching
+// useQuery   → runs automatically (GET doctors)
+// useMutation → waits for button click (POST appointment)
 // ============================================
 
-// useQuery — the main React Query hook
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 // =============================================
-// FETCH FUNCTION
-// =============================================
-// React Query calls this automatically
-// we just describe HOW to fetch
+// fetch function for useQuery
 // =============================================
 async function fetchDoctors() {
   const response = await fetch("https://jsonplaceholder.typicode.com/users");
+  return response.json();
+}
 
-  if (!response.ok) {
-    throw new Error("Could not fetch doctors");
-  }
-
+// =============================================
+// post function for useMutation
+// =============================================
+async function bookAppointment(appointmentData) {
+  const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(appointmentData),
+  });
   return response.json();
 }
 
 function App() {
+  const [name, setName] = useState("");
+
   // =============================================
-  // useQuery — THE MAIN CONCEPT
+  // useQuery — RUNS AUTOMATICALLY
   // =============================================
-  // queryKey: ["doctors"]
-  //   → cache label for this data
-  //   → React Query remembers data under this key
-  //
-  // queryFn: fetchDoctors
-  //   → the function that does the actual fetching
-  //   → React Query calls it automatically
-  //
-  // Returns automatically:
-  //   data      → the fetched doctors
-  //   isLoading → true while fetching
-  //   error     → not null if something failed
+  // the moment App component loads
+  // fetchDoctors runs by itself
+  // we don't click anything
   // =============================================
-  const { data, isLoading, error } = useQuery({
+  const { data: doctors, isLoading } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctors,
   });
 
-  // LOADING
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          maxWidth: "500px",
-          margin: "40px auto",
-          textAlign: "center",
-          fontFamily: "sans-serif",
-          color: "#888",
-        }}
-      >
-        <p style={{ fontSize: "18px" }}>Loading doctors...</p>
-      </div>
-    );
+  // =============================================
+  // useMutation — WAITS for trigger
+  // =============================================
+  // bookAppointment does NOT run yet
+  // it waits until we call mutation.mutate()
+  // =============================================
+  const mutation = useMutation({
+    mutationFn: bookAppointment,
+  });
+
+  function handleBook() {
+    // =============================================
+    // THIS is what TRIGGERS the mutation
+    // =============================================
+    // mutation.mutate(data)
+    // → NOW bookAppointment actually runs
+    // =============================================
+    mutation.mutate({ patientName: name });
   }
 
-  // ERROR
-  if (error) {
-    return (
-      <div
-        style={{
-          maxWidth: "500px",
-          margin: "40px auto",
-          fontFamily: "sans-serif",
-          padding: "0 16px",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fcebeb",
-            border: "1px solid #f0a0a0",
-            borderRadius: "8px",
-            padding: "24px",
-            textAlign: "center",
-            color: "#a32d2d",
-          }}
-        >
-          <p style={{ fontWeight: "500", margin: "0 0 8px" }}>
-            Something went wrong
-          </p>
-          <p style={{ fontSize: "14px", margin: 0 }}>{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // SUCCESS
   return (
     <div
       style={{
-        maxWidth: "500px",
+        maxWidth: "400px",
         margin: "40px auto",
-        padding: "0 16px",
         fontFamily: "sans-serif",
+        padding: "0 16px",
       }}
     >
-      <h1 style={{ color: "#1a1a2e", marginBottom: "16px" }}>ZENOVA Clinic</h1>
+      <h1 style={{ color: "#1a1a2e", marginBottom: "16px" }}>
+        useQuery vs useMutation
+      </h1>
 
-      {data.map((doctor) => (
-        <div
-          key={doctor.id}
+      {/* =============================================
+          useQuery part — runs automatically
+          ============================================= */}
+      <div
+        style={{
+          backgroundColor: "#e6f1fb",
+          border: "1px solid #b5d4f4",
+          borderRadius: "8px",
+          padding: "16px",
+          marginBottom: "24px",
+        }}
+      >
+        <p style={{ margin: "0 0 8px", fontWeight: "500", color: "#185fa5" }}>
+          useQuery (automatic)
+        </p>
+        {isLoading ? (
+          <p style={{ margin: 0, fontSize: "14px", color: "#185fa5" }}>
+            Loading doctors...
+          </p>
+        ) : (
+          <p style={{ margin: 0, fontSize: "14px", color: "#185fa5" }}>
+            {doctors.length} doctors loaded automatically
+          </p>
+        )}
+      </div>
+
+      {/* =============================================
+          useMutation part — waits for click
+          ============================================= */}
+      <div
+        style={{
+          backgroundColor: "#fbeaf0",
+          border: "1px solid #f4c0d1",
+          borderRadius: "8px",
+          padding: "16px",
+        }}
+      >
+        <p style={{ margin: "0 0 8px", fontWeight: "500", color: "#993556" }}>
+          useMutation (waits for click)
+        </p>
+
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
           style={{
-            backgroundColor: "white",
+            width: "100%",
+            padding: "8px 12px",
+            fontSize: "13px",
             border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "16px",
-            marginBottom: "12px",
+            borderRadius: "6px",
+            marginBottom: "10px",
+            boxSizing: "border-box",
+          }}
+        />
+
+        {/* clicking THIS triggers the mutation */}
+        <button
+          onClick={handleBook}
+          disabled={mutation.isPending}
+          style={{
+            width: "100%",
+            backgroundColor: "#993556",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            padding: "10px",
+            fontSize: "13px",
+            cursor: "pointer",
           }}
         >
-          <h2 style={{ margin: "0 0 6px", color: "#1a1a2e", fontSize: "16px" }}>
-            {doctor.name}
-          </h2>
-          <p style={{ margin: "4px 0", color: "#555", fontSize: "14px" }}>
-            {doctor.email}
+          {mutation.isPending ? "Booking..." : "Click to trigger mutation"}
+        </button>
+
+        {mutation.isSuccess && (
+          <p style={{ margin: "10px 0 0", fontSize: "13px", color: "#0f6e56" }}>
+            ✓ Mutation triggered successfully!
           </p>
-        </div>
-      ))}
+        )}
+      </div>
     </div>
   );
 }
