@@ -82,6 +82,16 @@ export default function RootLayout({ children }) {
           >
             Doctors
           </Link>
+          <Link
+            href="/booking"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              fontSize: "14px",
+            }}
+          >
+            Booking
+          </Link>
         </nav>
 
         {children}
