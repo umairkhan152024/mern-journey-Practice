@@ -92,6 +92,16 @@ export default function RootLayout({ children }) {
           >
             Booking
           </Link>
+          <Link
+            href="/admin"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              fontSize: "14px",
+            }}
+          >
+            Admin
+          </Link>
         </nav>
 
         {children}
