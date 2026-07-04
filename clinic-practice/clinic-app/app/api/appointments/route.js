@@ -1,39 +1,25 @@
 // ============================================
 // FILE: app/api/appointments/route.js
 // ============================================
-// This file = a backend API endpoint
-// URL: /api/appointments
-//
-// Two functions exported:
-// POST → saves a new appointment
-// GET  → returns all appointments
-//
-// This runs on the SERVER
-// Can connect to databases
-// User never sees this code
+// NOW CONNECTED TO MONGODB
+// appointments are saved permanently
+// no longer lost on server restart
 // ============================================
-
-// temporary storage — resets when server restarts
-// later we replace this with MongoDB
-let appointments = [];
+import connectDB from "@/lib/mongodb";
+import Appointment from "@/models/Appointment";
 
 // =============================================
-// POST function
-// =============================================
-// runs when someone sends a POST request
-// to /api/appointments
-//
-// example: BookingForm submits →
-// fetch("/api/appointments", { method: "POST", body: {...} })
-// → THIS function runs
+// POST — save new appointment to MongoDB
 // =============================================
 export async function POST(request) {
   try {
-    // request.json() reads the data sent from the form
-    // same as req.body in Express
+    // connect to MongoDB first
+    await connectDB();
+
+    // read form data from request
     const body = await request.json();
 
-    // validate — make sure required fields exist
+    // validate required fields
     if (!body.patientName || !body.phone) {
       return Response.json(
         { error: "Name and phone are required" },
@@ -41,43 +27,51 @@ export async function POST(request) {
       );
     }
 
-    // create appointment object
-    const appointment = {
-      id: Date.now().toString(), // unique id based on timestamp
+    // =============================================
+    // create and save to MongoDB
+    // =============================================
+    // Appointment.create() does two things:
+    // 1. creates a new appointment object
+    // 2. saves it to MongoDB immediately
+    // =============================================
+    const appointment = await Appointment.create({
       patientName: body.patientName,
       phone: body.phone,
       service: body.service || "",
       status: "pending",
-      createdAt: new Date().toISOString(),
-    };
+    });
 
-    // save to our temporary array
-    appointments.push(appointment);
+    // log to terminal
+    console.log("Saved to MongoDB:", appointment.patientName);
 
-    // log to terminal so you can see it working
-    console.log("New appointment:", appointment.patientName);
-    console.log("Total appointments:", appointments.length);
-
-    // send success response back
-    // status 201 = "Created" (standard for POST success)
+    // send success response
     return Response.json({ success: true, appointment }, { status: 201 });
   } catch (error) {
+    console.log("Error:", error);
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 // =============================================
-// GET function
-// =============================================
-// runs when someone sends a GET request
-// to /api/appointments
-//
-// example: Admin dashboard loads →
-// fetch("/api/appointments")
-// → THIS function runs
-// → returns all appointments
+// GET — fetch all appointments from MongoDB
 // =============================================
 export async function GET() {
-  // return all appointments as JSON
-  return Response.json(appointments);
+  try {
+    // connect to MongoDB
+    await connectDB();
+
+    // =============================================
+    // Appointment.find({})
+    // =============================================
+    // find() fetches ALL documents from MongoDB
+    // {} means no filter — get everything
+    // sort({ createdAt: -1 }) = newest first
+    // =============================================
+    const appointments = await Appointment.find({}).sort({ createdAt: -1 });
+
+    return Response.json(appointments);
+  } catch (error) {
+    console.log("Error:", error);
+    return Response.json({ error: "Server error" }, { status: 500 });
+  }
 }
