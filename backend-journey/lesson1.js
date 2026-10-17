@@ -6,7 +6,8 @@
 // ============================================
 
 // SYNC: runs immediately
-console.log("1. First");
+console.log("1. First - nodemon works!");
+console.log("2. Second - nodemon works!");
 
 // ASYNC: Node sends to background, moves on
 setTimeout(function () {
